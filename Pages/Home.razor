@@ -1,25 +1,58 @@
 ﻿@page "/"
+@using Afterpelago.Utilities
+@using System.Threading.Tasks
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Afterpelago</PageTitle>
+<main class="centered">
 
-<h1>Hello, world!</h1>
+    <h1>Afterpelago</h1>
 
-Welcome to your new app.
+    Welcome to the Post-Game Party
 
-<MudFileUpload T="IBrowserFile" FilesChanged="UploadLog">
-    <ActivatorContent>
-        <MudFab Color="Color.Secondary"
-                StartIcon="@Icons.Material.Filled.Image"
-                Label="Load picture" />
-    </ActivatorContent>
-</MudFileUpload>
+    <MudFileUpload T="IBrowserFile" FilesChanged="UploadLog">
+        <ActivatorContent>
+            <MudFab Color="Color.Secondary"
+                    StartIcon="@Icons.Material.Filled.Image"
+                    Label="Load picture" />
+        </ActivatorContent>
+    </MudFileUpload>
+</main>
 
+@* @code
+{
+    IList<IBrowserFile> _files = new List<IBrowserFile>();
+    private async Task UploadLog(IBrowserFile file)
+    {
+        using (var stream = file.OpenReadStream())
+        {
+            using (var sr = new StreamReader(stream))
+            {
+                var contents = await sr.ReadToEndAsync();
+                Console.WriteLine("CONTESNTS: ", contents);
+            }
+        }
+    }
+} *@
+
+@if (_files != null)
+{
+    <MudText Typo="@Typo.h6">@_files.Count() File@(_files.Count() == 1 ? "" : "s"):</MudText>
+    <MudList T="string">
+        @foreach (var file in _files)
+        {
+            <MudListItem Icon="@Icons.Material.Filled.AttachFile" @key="@file">
+                @file.Name <code>@file.Size bytes</code>
+            </MudListItem>
+        }
+    </MudList>
+}
 @code
 {
     IList<IBrowserFile> _files = new List<IBrowserFile>();
-    private void UploadLog(IBrowserFile file)
+    private async Task UploadLog(IBrowserFile file)
     {
         _files.Add(file);
         //TODO upload the files to the server
+        LogManager.ReadFromFile(file);
     }
 }
