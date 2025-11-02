@@ -13,6 +13,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.19" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.19" PrivateAssets="all" />
     <PackageReference Include="MudBlazor" Version="8.13.0" />
+    <PackageReference Include="Tewr.BlazorWorker.BackgroundService" Version="5.0.1" />
   </ItemGroup>
 
   <ItemGroup>

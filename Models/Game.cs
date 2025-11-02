@@ -1,15 +1,20 @@
-﻿namespace Afterpelago.Models
+﻿using System.Runtime.Serialization;
+
+namespace Afterpelago.Models
 {
+    [DataContract]
     public class Game
     {
         /// <summary>
         /// The name of the Game, as it shows up in the log file exactly
         /// </summary>
+        [DataMember]
         public string RealName { get; private set; }
 
         /// <summary>
         /// The name of the Game to display to the user. In some cases, this may be different from the Real Name.
         /// </summary>
+        [IgnoreDataMember]
         public string FriendlyName
         {
             get

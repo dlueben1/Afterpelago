@@ -1,4 +1,7 @@
 ﻿using Afterpelago.Models;
+using Afterpelago.Serializers;
+using Afterpelago.Services;
+using BlazorWorker.BackgroundServiceFactory;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -8,6 +11,8 @@ namespace Afterpelago.Components
     {
         [Parameter]
         public required CheckObtainedLogEntry[] Checks { get; set; }
+
+        public Dictionary<int, string> tooltipMap { get; set; }
 
         public bool HasLoaded { get; private set; } = false;
 
@@ -24,8 +29,6 @@ namespace Afterpelago.Components
 
         private AxisChartOptions _axisChartOptions = new() { };
 
-        private TimeSeriesChartSeries dataAsSeries = new();
-
         private List<TimeSeriesChartSeries> _series = new();
 
         private readonly Random _random = new Random();
@@ -33,28 +36,44 @@ namespace Afterpelago.Components
         private bool _roundedLabelSpacing = false;
         private bool _roundedLabelSpacingPadSeries = false;
 
-        private string _width = "650px";
-        private string _height = "350px";
+        private string _width = "100%";
+        private string _height = "100%";
 
         /// <summary>
         /// When the Component Mounts, build the Chart Data
         /// </summary>
         protected override async Task OnInitializedAsync()
         {
-            dataAsSeries = new TimeSeriesChartSeries
+            // Create the WebWorker for Async (I wish we had WASM Threads working...)
+            var worker = await workerFactory.CreateAsync();
+
+            // Create the service reference for the WebWorker
+            var service = await worker.CreateBackgroundServiceAsync<ChartBuilderWebWorkerService>(options => options.UseCustomExpressionSerializer(typeof(CustomCheckSerializer)));
+
+            // Build the chart series (and make a local reference to get around some scope shenanigans...)
+            var scopeSafeChecks = this.Checks;
+            var result = await service.RunAsync(s => s.BuildChartDataFromChecks(scopeSafeChecks));
+
+            // If this worked, store it locally and force a refresh
+            if(result != null)
             {
-                Index = 0,
-                Name = "All Checks Obtained",
-                Data = Checks.Select((check, index) => new TimeSeriesChartSeries.TimeValue(check.Timestamp, index)).ToList(),
-                IsVisible = true,
-                LineDisplayType = LineDisplayType.Line,
-                DataMarkerTooltipTitleFormat = "{{X_VALUE}}",
-                DataMarkerTooltipSubtitleFormat = "{{Y_VALUE}}"
-            };
+                _series.Add(new TimeSeriesChartSeries
+                {
+                    Index = 0,
+                    Name = "All Checks Obtained",
+                    Data = result,
+                    IsVisible = true,
+                    LineDisplayType = LineDisplayType.Line,
+                    DataMarkerTooltipTitleFormat = $"hey",
+                    DataMarkerTooltipSubtitleFormat = "{{X_VALUE}}"
+                });
+                HasLoaded = true;
+                StateHasChanged();
+            }
 
-            _series.Add(dataAsSeries);
-
-            StateHasChanged();
+            // Dispose of the WW
+            await service.DisposeAsync();
+            await worker.DisposeAsync();
         }
     }
 }
