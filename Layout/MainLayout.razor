@@ -1,21 +1,45 @@
 ﻿@inherits LayoutComponentBase
+@using System.Reflection
 <MudThemeProvider />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <div class="page">
-@*     <div class="sidebar">
-        <NavMenu />
-    </div> *@
 
-    <main>
-@*         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div> *@
+    <MudLayout>
+        <MudAppBar Elevation="1" hidden="@(Archipelago.SetupComplete == false)">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Href="https://github.com/MudBlazor/MudBlazor" Target="_blank" />
+        </MudAppBar>
+        <MudDrawer @bind-Open="@_open" Elevation="1" hidden="@(Archipelago.SetupComplete == false)">
+            <MudDrawerHeader>
+                <MudText Typo="Typo.h6">Afterpelago</MudText>
+            </MudDrawerHeader>
+            <MudNavMenu>
+                <MudNavLink Match="NavLinkMatch.All">Dashboard</MudNavLink>
+                @* <MudNavLink Match="NavLinkMatch.All">Library</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.All">Community</MudNavLink> *@
+            </MudNavMenu>
+        </MudDrawer>
+        <MudMainContent Style="padding-top: 0 !important;">
+            <main>
+                @Body
+            </main>
+        </MudMainContent>
+    </MudLayout>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+    <footer style="position: absolute; right: 16px; bottom: 16px; font-size: 1em;">
+        v @typeof(Program).Assembly.GetName().Version.ToString()
+    </footer>
 </div>
+
+@code {
+    private bool _open = false;
+
+    private void ToggleDrawer()
+    {
+        _open = !_open;
+    }
+}

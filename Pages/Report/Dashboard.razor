@@ -1,0 +1,9 @@
+﻿@page "/report/dashboard"
+@using Afterpelago.Components;
+
+<article style="display: flex; flex-direction: row; padding: 4em;" Class="mt-16">
+    <MudPaper Width="80%" Height="600px" Style="position: relative;">
+        <h2>Checks over Time</h2>
+        <ChecksChart Checks="@Archipelago.Checks" />
+    </MudPaper>
+</article>

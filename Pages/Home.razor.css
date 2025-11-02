@@ -1,0 +1,17 @@
+﻿h1 {
+    font-size: 4em;
+    font-weight: bold;
+}
+
+span {
+    font-size: 2em;
+}
+
+.home-view-btn {
+    background-color: greenyellow;
+    color: white;
+    width: 32em;
+    height: 8em;
+    font-size: 1.25em;
+    padding-bottom: 8px
+}

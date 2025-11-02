@@ -1,58 +1,30 @@
 ﻿@page "/"
+
 @using Afterpelago.Utilities
 @using System.Threading.Tasks
 
+@inject NavigationManager NavManager
+
 <PageTitle>Afterpelago</PageTitle>
-<main class="centered">
+<article class="centered">
 
     <h1>Afterpelago</h1>
 
-    Welcome to the Post-Game Party
+    <span>Welcome to the Post-Game Party</span>
 
-    <MudFileUpload T="IBrowserFile" FilesChanged="UploadLog">
-        <ActivatorContent>
-            <MudFab Color="Color.Secondary"
-                    StartIcon="@Icons.Material.Filled.Image"
-                    Label="Load picture" />
-        </ActivatorContent>
-    </MudFileUpload>
-</main>
+    <!-- View Button -->
+    <MudButton 
+        OnClick="ToSetup"
+        Variant="Variant.Filled" 
+        StartIcon="@Icons.Material.Rounded.Build"
+        Style="background-color: yellowgreen; color: white; width: 26em; height: 6em; font-size: 1.25em; margin-top: 2em;">
+        Build your Post-Game Report
+    </MudButton>
+</article>
 
-@* @code
-{
-    IList<IBrowserFile> _files = new List<IBrowserFile>();
-    private async Task UploadLog(IBrowserFile file)
+@code {
+    private void ToSetup()
     {
-        using (var stream = file.OpenReadStream())
-        {
-            using (var sr = new StreamReader(stream))
-            {
-                var contents = await sr.ReadToEndAsync();
-                Console.WriteLine("CONTESNTS: ", contents);
-            }
-        }
-    }
-} *@
-
-@if (_files != null)
-{
-    <MudText Typo="@Typo.h6">@_files.Count() File@(_files.Count() == 1 ? "" : "s"):</MudText>
-    <MudList T="string">
-        @foreach (var file in _files)
-        {
-            <MudListItem Icon="@Icons.Material.Filled.AttachFile" @key="@file">
-                @file.Name <code>@file.Size bytes</code>
-            </MudListItem>
-        }
-    </MudList>
-}
-@code
-{
-    IList<IBrowserFile> _files = new List<IBrowserFile>();
-    private async Task UploadLog(IBrowserFile file)
-    {
-        _files.Add(file);
-        //TODO upload the files to the server
-        LogManager.ReadFromFile(file);
+        NavManager.NavigateTo("/setup");
     }
 }

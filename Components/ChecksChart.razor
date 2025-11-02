@@ -1,0 +1,18 @@
+﻿@if(!HasLoaded)
+{
+    <MudProgressCircular Size="Size.Large" Indeterminate="true" Style="position: absolute; left: 50%; top: 50%; transform: translate(-50% -50%);" />
+}
+else
+{
+    <MudTimeSeriesChart ChartSeries="@_series"
+                        @bind-SelectedIndex="_index"
+                        Width="@_width"
+                        Height="@_height"
+                        ChartOptions="@_options"
+                        AxisChartOptions="@_axisChartOptions"
+                        CanHideSeries="true"
+                        TimeLabelSpacing="TimeSpan.FromMinutes(5)"
+                        TimeLabelSpacingRounding="_roundedLabelSpacing"
+                        TimeLabelSpacingRoundingPadSeries="_roundedLabelSpacingPadSeries"
+                        DataMarkerTooltipTimeLabelFormat="yyyy MMM dd HH:mm:ss" />
+}

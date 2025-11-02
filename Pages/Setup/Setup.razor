@@ -1,0 +1,59 @@
+﻿@page "/setup"
+
+@using Afterpelago.Utilities
+
+<main class="centered">
+    <h1>Let's Get Started</h1>
+    <p>To get started, we're going to need some information from you</p>
+    <MudPaper Outlined Style="min-width: 30%; min-height: 30%; margin-top: 4em;">
+        <MudStepper Vertical OnPreviewInteraction="OnPreviewNavigation">
+            <ChildContent>
+
+                <!-- Step 1: Upload Log File -->
+                <MudStep Title="Upload Required Files">
+                    <h2>Log File</h2>
+                    <MudFileUpload 
+                        Disabled="LogFileStatus != LogUploadStatus.NotStarted"  
+                        T="IBrowserFile" 
+                        Accept=".txt" 
+                        FilesChanged="ProcessLogFile">
+                        <ActivatorContent>
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       StartIcon="@LogUploadIcon">
+                                @switch(LogFileStatus)
+                                {
+                                    case LogUploadStatus.NotStarted:
+                                        <MudText class="ms-2">Upload Log File</MudText>
+                                        break;
+                                    case LogUploadStatus.Processing:
+                                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                        <MudText Class="ms-2">Processing...</MudText>
+                                        break;
+                                    case LogUploadStatus.Completed:
+                                        <MudText Class="ms-2">Log Processed</MudText>
+                                        break;
+                                }
+                            </MudButton>
+                        </ActivatorContent>
+                    </MudFileUpload>
+                </MudStep>
+
+                <!-- Step 2: Get Game Data -->
+                <MudStep Title="Obtain Game Information">
+                    <h2>Detected Games</h2>
+                    @foreach(var game in Archipelago.Games.Values)
+                    {
+                        <MudText>@game.RealName</MudText>
+                    }
+                </MudStep>
+
+            </ChildContent>
+
+            <!-- Final Step: Should only be seen while loading, for a brief moment -->
+            <CompletedContent>
+                Putting the finishing touches on your Post-Game report!
+            </CompletedContent>
+        </MudStepper>
+    </MudPaper>
+</main>
