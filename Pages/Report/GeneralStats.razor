@@ -1,0 +1,26 @@
+﻿@page "/report/general"
+@using Afterpelago.Utilities
+
+<article style="display: flex; flex-direction: row; padding: 4em;" Class="mt-16">
+    <MudStack Style="width: 100%;">
+        <MudCard Style="width: 100%;">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Session Statistics</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudList T="string">
+                    <MudListItem Text="Active Playtime (Not Working)" SecondaryText="@ActivePlayTime" />
+                    <MudListItem Text="Start Time" SecondaryText="@StartTime" />
+                    <MudListItem Text="End Time" SecondaryText="@EndTime" />
+                    <MudDivider />
+                    <MudListItem Text="First Check (Location)" SecondaryText="@FirstCheck" />
+                    <MudListItem Text="First Check (Time)" SecondaryText="@FirstCheckClear" />
+                    <MudListItem Text="Last Check (Location)" SecondaryText="@LastCheck" />
+                    <MudListItem Text="Last Check (Time)" SecondaryText="@LastCheckClear" />
+                </MudList>
+            </MudCardContent>
+        </MudCard>
+    </MudStack>
+</article>

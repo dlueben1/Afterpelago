@@ -1,9 +1,11 @@
 ﻿using Afterpelago.Models;
 using Afterpelago.Serializers;
 using Afterpelago.Services;
+using ApexCharts;
 using BlazorWorker.BackgroundServiceFactory;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using static MudBlazor.Icons;
 
 namespace Afterpelago.Components
 {
@@ -12,68 +14,66 @@ namespace Afterpelago.Components
         [Parameter]
         public required CheckObtainedLogEntry[] Checks { get; set; }
 
-        public Dictionary<int, string> tooltipMap { get; set; }
+        private List<Check> Data { get; set; } = new();
 
-        public bool HasLoaded { get; private set; } = false;
+        public bool HasLoaded { get; private set; } = true;
 
-        private int _index = -1; //default value cannot be 0 -> first selectedindex is 0.
-        private ChartOptions _options = new ChartOptions
+        public ApexChartOptions<Check> ChartOptions = new ApexChartOptions<CheckObtainedLogEntry>
         {
-            YAxisLines = false,
-            YAxisTicks = 500,
-            MaxNumYAxisTicks = 10,
-            YAxisRequireZeroPoint = true,
-            XAxisLines = false,
-            LineStrokeWidth = 1,
+            Chart = new Chart
+            {
+                Type = ApexCharts.ChartType.Line,
+                Height = 350
+            },
+            Xaxis = new XAxis
+            {
+                Type = XAxisType.Datetime,
+                Title = new AxisTitle
+                {
+                    Text = "Time Obtained"
+                }
+            }
         };
 
-        private AxisChartOptions _axisChartOptions = new() { };
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
 
-        private List<TimeSeriesChartSeries> _series = new();
+            // Last value is invalid, usually (@todo fix this? it's faster than where though)
+            Data = Checks.SkipLast(1).ToList();
+        }
 
-        private readonly Random _random = new Random();
-
-        private bool _roundedLabelSpacing = false;
-        private bool _roundedLabelSpacingPadSeries = false;
-
-        private string _width = "100%";
-        private string _height = "100%";
+        public MarkupString ShowTooltip(Check check)
+        {
+            return (MarkupString)$"<b>{check.SenderName}</b> found <b>{check.ItemName}</b> for <b>{check.ReceiverName}</b><br/>{check.LocationName}\n<br/>{check.Timestamp.ToShortDateString()} {check.Timestamp.ToShortTimeString()}";
+        }
 
         /// <summary>
         /// When the Component Mounts, build the Chart Data
         /// </summary>
         protected override async Task OnInitializedAsync()
         {
-            // Create the WebWorker for Async (I wish we had WASM Threads working...)
-            var worker = await workerFactory.CreateAsync();
+            //// Create the WebWorker for Async (I wish we had WASM Threads working...)
+            //var worker = await workerFactory.CreateAsync();
 
-            // Create the service reference for the WebWorker
-            var service = await worker.CreateBackgroundServiceAsync<ChartBuilderWebWorkerService>(options => options.UseCustomExpressionSerializer(typeof(CustomCheckSerializer)));
+            //// Create the service reference for the WebWorker
+            //var service = await worker.CreateBackgroundServiceAsync<ChartBuilderWebWorkerService>(options => options.UseCustomExpressionSerializer(typeof(CustomCheckSerializer)));
 
-            // Build the chart series (and make a local reference to get around some scope shenanigans...)
-            var scopeSafeChecks = this.Checks;
-            var result = await service.RunAsync(s => s.BuildChartDataFromChecks(scopeSafeChecks));
+            //// Build the chart series (and make a local reference to get around some scope shenanigans...)
+            //var scopeSafeChecks = this.Checks;
+            //var result = await service.RunAsync(s => s.BuildChartDataFromChecks(scopeSafeChecks));
 
-            // If this worked, store it locally and force a refresh
-            if(result != null)
-            {
-                _series.Add(new TimeSeriesChartSeries
-                {
-                    Index = 0,
-                    Name = "All Checks Obtained",
-                    Data = result,
-                    IsVisible = true,
-                    LineDisplayType = LineDisplayType.Line,
-                    DataMarkerTooltipTitleFormat = $"hey",
-                    DataMarkerTooltipSubtitleFormat = "{{X_VALUE}}"
-                });
-                HasLoaded = true;
-                StateHasChanged();
-            }
+            //// If this worked, store it locally and force a refresh
+            //if(result != null)
+            //{
+            //    Data = result;
+            //    HasLoaded = true;
+            //    StateHasChanged();
+            //}
 
             // Dispose of the WW
-            await service.DisposeAsync();
-            await worker.DisposeAsync();
+            //await service.DisposeAsync();
+            //await worker.DisposeAsync();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Afterpelago.Models;
+﻿using Afterpelago.Components;
+using Afterpelago.Models;
 using MudBlazor;
 
 namespace Afterpelago.Services
@@ -9,9 +10,9 @@ namespace Afterpelago.Services
     /// </summary>
     public class ChartBuilderWebWorkerService
     {
-        public List<TimeSeriesChartSeries.TimeValue> BuildChartDataFromChecks(CheckObtainedLogEntry[] checks)
-        {
-            return checks.Select((check, index) => new TimeSeriesChartSeries.TimeValue(check.Timestamp, index)).ToList();
-        } 
+        //public List<ChecksChart.CheckChartData> BuildChartDataFromChecks(CheckObtainedLogEntry[] checks)
+        //{
+        //    return checks.Select((check, index) => new ChecksChart.CheckChartData(check.Timestamp, index, "Test")).ToList();
+        //} 
     }
 }

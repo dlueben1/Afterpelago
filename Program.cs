@@ -1,3 +1,4 @@
+using ApexCharts;
 using BlazorWorker.Core;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -18,6 +19,8 @@ namespace Afterpelago
             builder.Services.AddMudServices();
 
             builder.Services.AddWorkerFactory();
+
+            builder.Services.AddApexCharts();
 
             await builder.Build().RunAsync();
         }

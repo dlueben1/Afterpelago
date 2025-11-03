@@ -26,5 +26,7 @@ namespace Afterpelago
         /// All checks in the game session, in the order they were obtained
         /// </summary>
         public static Check[] Checks { get; set; } = Array.Empty<Check>();
+
+        public static TimeSpan TotalActivePlaytime { get; set; }
     }
 }

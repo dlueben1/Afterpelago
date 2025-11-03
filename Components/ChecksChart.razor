@@ -4,20 +4,24 @@
 
 @if(!HasLoaded)
 {
-    <MudProgressCircular Size="Size.Large" Indeterminate="true" Style="position: absolute; left: 50%; top: 50%; transform: translate(-50% -50%);" />
+    <MudProgressCircular Size="MudBlazor.Size.Large" Indeterminate="true" Style="position: absolute; left: 50%; top: 50%; transform: translate(-50% -50%);" />
 }
-else
-{
-    <MudTimeSeriesChart ChartSeries="@_series"
-                        @bind-SelectedIndex="_index"
-                        Width="@_width"
-                        Height="@_height"
-                        ChartOptions="@_options"
-                        AxisChartOptions="@_axisChartOptions"
-                        CanHideSeries="true"
-                        TimeLabelSpacing="TimeSpan.FromHours(1)"
-                        TimeLabelSpacingRounding="_roundedLabelSpacing"
-                        TimeLabelSpacingRoundingPadSeries="_roundedLabelSpacingPadSeries"
-                        DataMarkerTooltipTimeLabelFormat="yyyy MMM dd HH:mm:ss">
-    </MudTimeSeriesChart>
-}
+<ApexChart TItem="Check"
+           Title="Checks Over Time"
+           Options="ChartOptions">
+
+    <ApexPointTooltip>
+        <div>
+            @ShowTooltip(context.DataPoint.Items.First())
+        </div>
+    </ApexPointTooltip>
+
+    <ChildContent>
+        <ApexPointSeries TItem="Check"
+                         Items="Data"
+                         Name="Checks"
+                         SeriesType="SeriesType.Line"
+                         XValue="e => e.Timestamp"
+                         YValue="e => e.ObtainedOrder" />
+    </ChildContent>
+</ApexChart>

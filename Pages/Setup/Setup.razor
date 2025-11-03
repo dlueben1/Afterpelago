@@ -19,7 +19,7 @@
                         FilesChanged="ProcessLogFile">
                         <ActivatorContent>
                             <MudButton Variant="Variant.Filled"
-                                       Color="Color.Primary"
+                                       Color="MudBlazor.Color.Primary"
                                        StartIcon="@LogUploadIcon">
                                 @switch(LogFileStatus)
                                 {
@@ -27,7 +27,7 @@
                                         <MudText class="ms-2">Upload Log File</MudText>
                                         break;
                                     case LogUploadStatus.Processing:
-                                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                        <MudProgressCircular Class="ms-n1" Size="MudBlazor.Size.Small" Indeterminate="true" />
                                         <MudText Class="ms-2">Processing...</MudText>
                                         break;
                                     case LogUploadStatus.Completed:

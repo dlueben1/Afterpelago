@@ -2,8 +2,52 @@
 @using Afterpelago.Components;
 
 <article style="display: flex; flex-direction: row; padding: 4em;" Class="mt-16">
-    <MudPaper Width="80%" Height="600px" Style="position: relative;">
-        <h2>Checks over Time</h2>
-        <ChecksChart Checks="@Archipelago.Checks" />
-    </MudPaper>
+    <MudGrid>
+
+        <!-- Overview Statistics -->
+        <MudItem xs="4">
+            <MudCard Outlined="true" Class="mud-theme-primary">
+                <MudCardContent>
+                    <MudText>Multiworld Statistics</MudText>
+                    <MudText Typo="Typo.body2">View information about the overall Multiworld & Sessions</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="MudBlazor.Variant.Filled" Color="MudBlazor.Color.Success" Href="/report/general">See More</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        <!-- Player Statistics -->
+        <MudItem xs="4">
+            <MudCard Outlined="true" Class="mud-theme-secondary">
+                <MudCardContent>
+                    <MudText>Player Statistics</MudText>
+                    <MudText Typo="Typo.body2">See individual Player statistics</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="MudBlazor.Variant.Filled" Color="MudBlazor.Color.Success">See More</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        <!-- Sphere Statistics -->
+        <MudItem xs="4">
+            <MudCard Outlined="true" Style="background-color: var(--mud-palette-action-disabled-background);">
+                <MudCardContent>
+                    <MudText>Sphere Statistics</MudText>
+                    <MudText Typo="Typo.body2">(Coming Soon)</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Disabled Variant="MudBlazor.Variant.Filled" Color="MudBlazor.Color.Transparent">See More</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        <!-- Main Checks Graph -->
+        <MudItem xs="12">
+            <MudPaper Width="100%" Height="100%">
+                <ChecksChart Checks="@Archipelago.Checks" />
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
 </article>

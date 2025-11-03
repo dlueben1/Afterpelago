@@ -7,7 +7,10 @@ namespace Afterpelago.Models
         Unknown,
         HostStart,
         PlayerConnection,
+        PlayerDisconnect,
         CheckFound,
+        Release,
+        ServerShutdown
     }
 
     /// <summary>
@@ -29,10 +32,58 @@ namespace Afterpelago.Models
     }
 
     [DataContract]
+    public class ReleaseLogEntry : LogEntry
+    {
+        /// <summary>
+        /// The Checks that were completed by releasing the game
+        /// </summary>
+        [DataMember]
+        public Check[] ChecksFromRelease { get; set; }
+
+        [DataMember]
+        public required string SlotName { get; set; }
+
+        [IgnoreDataMember]
+        public Slot? Slot
+        {
+            get
+            {
+                Slot? slot;
+                if (Archipelago.Slots.TryGetValue(SlotName, out slot))
+                {
+                    return slot;
+                }
+                return null;
+            }
+        }
+
+        public ReleaseLogEntry()
+        {
+            Category = LogEntryType.Release;
+            ChecksFromRelease = new Check[0];
+        }
+    }
+
+    [DataContract]
     public class ConnectionLogEntry : LogEntry
     {
         [DataMember]
         public required string SlotName { get; set; }
+
+        [IgnoreDataMember]
+        public Slot? Slot
+        {
+            get
+            {
+                Slot? slot;
+                if (Archipelago.Slots.TryGetValue(SlotName, out slot))
+                {
+                    return slot;
+                }
+                return null;
+            }
+        }
+
         [DataMember]
         public required string GameName { get; set; }
         [DataMember]
@@ -40,6 +91,17 @@ namespace Afterpelago.Models
         public ConnectionLogEntry()
         {
             Category = LogEntryType.PlayerConnection;
+        }
+    }
+
+    [DataContract]
+    public class DisconnectLogEntry : LogEntry
+    {
+        [DataMember]
+        public required string SlotName { get; set; }
+        public DisconnectLogEntry()
+        {
+            Category = LogEntryType.PlayerDisconnect;
         }
     }
 
@@ -54,6 +116,10 @@ namespace Afterpelago.Models
         public required string ItemName { get; set; }
         [DataMember]
         public required string LocationName { get; set; }
+
+        [DataMember]
+        public int ObtainedOrder { get; set; }
+
         [IgnoreDataMember]
         public bool IsSelfCollection
         {

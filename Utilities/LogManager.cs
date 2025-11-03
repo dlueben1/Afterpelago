@@ -46,6 +46,27 @@ namespace Afterpelago.Utilities
                  GameName = m.Groups["game"].Value,
                  ClientVersion = m.Groups["version"].Value
              }),
+            // Player Disconnection Entry
+            (new Regex(@"^Notice \(all\): (?<player>.+?) \(Team #\d+\) has left the game\. Client\(\d+\.\d+\.\d+\), \[\].$", RegexOptions.Compiled),
+             (Match m) => new DisconnectLogEntry
+             {
+                 Message = m.Value,
+                 SlotName = m.Groups["player"].Value
+             }),
+            // Server Shutdown Entry
+            (new Regex(@"^Shutting down due to inactivity\.$", RegexOptions.Compiled),
+             (Match m) => new LogEntry
+             {
+                 Message = m.Value,
+                 Category = LogEntryType.ServerShutdown
+             }),
+            // Completion/Release Entry
+            (new Regex(@"^Notice \(all\): (?<player>.+?) \(Team #\d+\) has released all remaining items from their world\.$", RegexOptions.Compiled),
+             (Match m) => new ReleaseLogEntry
+             {
+                 Message = m.Value,
+                 SlotName = m.Groups["player"].Value
+             }),
         };
 
         #endregion
@@ -56,6 +77,8 @@ namespace Afterpelago.Utilities
         /// Reads a log file line by line and processes all data provided by it.
         /// </summary>
         /// <!-- @todo this is not a well-written description... -->
+        /// <!-- @todo cut down on repeated code around total active playtime -->
+        /// <!-- @todo in the future there has got to be a way to make dynamic handlers so it isn't a giant function -->
         /// <param name="file">The Log File passed in from the UI</param>
         public static async Task ReadFromFile(IBrowserFile file)
         {
@@ -72,6 +95,11 @@ namespace Afterpelago.Utilities
 
                     // Buffer for all checks, which will eventually be converted into an Array for read speed
                     var checks = new List<Check>();
+
+                    // Buffer to keep track of total seconds of active gameplay, and number of actives players needed to access
+                    ulong totalActiveSeconds = 0;
+                    var _activePlayers = 0;
+                    DateTime _activeStart = DateTime.MinValue;
 
                     // Keep reading lines until the end of the file
                     while ((line = await sr.ReadLineAsync()) != null)
@@ -93,6 +121,12 @@ namespace Afterpelago.Utilities
                         {
                             case LogEntryType.PlayerConnection:
                             {
+                                // If there are no active players at this point, mark the start time
+                                if(_activePlayers == 0) _activeStart = entry.Timestamp;
+
+                                // Keep track of the number of connected players
+                                _activePlayers++;
+
                                 // Grab the details, and make sure it's not null (even though it shouldn't be, since we just matched it)
                                 var details = entry as ConnectionLogEntry;
                                 if (details == null) break;
@@ -111,11 +145,36 @@ namespace Afterpelago.Utilities
 
                                 break;
                             }
+                            case LogEntryType.PlayerDisconnect:
+                            {
+                                // Decrement the number of connected players
+                                _activePlayers--;
+
+                                // If there are no active players, add to the total active time
+                                if(_activePlayers == 0)
+                                {
+                                    var span = entry.Timestamp - _activeStart;
+                                    totalActiveSeconds += (ulong)Math.Truncate(span.TotalSeconds);
+                                }
+
+                                break;
+                            }
+                            case LogEntryType.ServerShutdown:
+                            {
+                                _activePlayers = 0; 
+                                var span = entry.Timestamp - _activeStart;
+                                _activeStart = entry.Timestamp;
+                                totalActiveSeconds += (ulong)Math.Truncate(span.TotalSeconds);
+                                break;
+                            }
                             case LogEntryType.CheckFound:
                             {
                                 // Grab the details, and make sure it's not null (even though it shouldn't be, since we just matched it)
                                 var details = entry as CheckObtainedLogEntry;
                                 if (details == null) break;
+
+                                // Keep track of the order in which these checks were obtained
+                                details.ObtainedOrder = checks.Count + 1;
 
                                 // Cache the check for later
                                 checks.Add(details);
@@ -125,17 +184,20 @@ namespace Afterpelago.Utilities
                         }
                     }
 
+                    // Once we're at the end of the log file, let's add in the remaining active play time
+                    if(_activePlayers > 0)
+                    {
+                        var finalSpan = lines[lines.Count - 2].Timestamp - _activeStart;
+                        totalActiveSeconds += (ulong)Math.Truncate(finalSpan.TotalSeconds);
+                    }
+
+                    // Store the total Active Play Time
+                    Archipelago.TotalActivePlaytime = TimeSpan.FromSeconds(totalActiveSeconds);
+
                     // Convert the log file and collection of checks into arrays for faster read access
                     rawLogs = lines.ToArray();
                     Archipelago.Checks = checks.ToArray();
                 }
-            }
-
-            // debug test
-            var connects = RawLogs.Where(l => l.Category == LogEntryType.PlayerConnection).ToArray();
-            foreach (var connect in connects)
-            {
-                Console.WriteLine($"{connect.Timestamp}: {connect.Message}");
             }
         }
 
