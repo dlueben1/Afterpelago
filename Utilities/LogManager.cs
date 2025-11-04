@@ -104,8 +104,8 @@ namespace Afterpelago.Utilities
         /// <param name="file">The Log File passed in from the UI</param>
         public static async Task ReadFromFile(IBrowserFile file)
         {
-            // Open the file as a StreamReader as process all lines into Afterpelago
-            using (var stream = file.OpenReadStream())
+            // Open the file as a StreamReader as process all lines into Afterpelago (max file size: 1.5GB)
+            using (var stream = file.OpenReadStream(maxAllowedSize: 1610612736))
             {
                 using (var sr = new StreamReader(stream))
                 {
