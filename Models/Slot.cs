@@ -17,10 +17,17 @@ namespace Afterpelago.Models
         [DataMember]
         public Game Game { get; private set; }
 
+        [DataMember]
+        public int? FinishOrder { get; set; } = null;
+
+        [IgnoreDataMember]
+        public List<Medal> Medals { get; private set; }
+
         public Slot(string name, Game game)
         {
             PlayerName = name;
             Game = game;
+            Medals = new List<Medal>();
         }
     }
         

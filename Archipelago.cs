@@ -30,6 +30,8 @@ namespace Afterpelago
 
         public static HintLogEntry[] Hints { get; set; } = Array.Empty<HintLogEntry>();
 
+        public static ReleaseLogEntry[] Releases { get; set; } = Array.Empty<ReleaseLogEntry>();
+
         public static TimeSpan TotalActivePlaytime { get; set; }
     }
 }

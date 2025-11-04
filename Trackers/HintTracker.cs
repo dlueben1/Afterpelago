@@ -91,7 +91,7 @@ namespace Afterpelago.Trackers
             // Determine which player had the most hints
             var _mostHintsPlayer = _stats.HintsByPlayer.OrderByDescending(kvp => kvp.Value).FirstOrDefault();
             _stats.PlayerWithMostHints = _stats.TotalHintCount == 0 ? "None (No Hints Used/Found)" : $"{_mostHintsPlayer.Key} ({_mostHintsPlayer.Value} Hints Obtained)";
-            
+
             // Determine which player had the hints to fulfill
             var _mostRefPlayer = _stats.HintsReferencingPlayer.OrderByDescending(kvp => kvp.Value).FirstOrDefault();
             _stats.PlayerMostReferencedInHints = _stats.TotalHintCount == 0 ? "None (No Hints Used/Found)" : $"{_mostRefPlayer.Key} ({_mostRefPlayer.Value} Hints were for this Player's World)";
@@ -104,7 +104,35 @@ namespace Afterpelago.Trackers
             _stats.FastestPayoff = _shortestPayoffHint;
             _stats.LongestPayoff = _longestPayoffHint;
 
+            // Update the Hint Statistics
             Statistics.Hints = _stats;
+
+            // At this point, back out if we have no hints
+            if (_stats.TotalHintCount == 0) return;
+
+            // Medal: First Hint Found
+            if (_stats.FirstHint != null)
+            {
+                var firstHintSlot = Archipelago.Slots.GetValueOrDefault(_stats.FirstHint.ReceiverName);
+                if (firstHintSlot != null)
+                {
+                    firstHintSlot.Medals.Add(new Medal("Very Curious", "Was the First Player to Obtain a Hint", MudBlazor.Icons.Material.Filled.Lightbulb));
+                }
+            }
+
+            // Medal: Most Hints Obtained
+            var playerWithMostHints = Archipelago.Slots.GetValueOrDefault(_mostHintsPlayer.Key);
+            if (playerWithMostHints != null)
+            {
+                playerWithMostHints.Medals.Add(new Medal("Fact Finder", "Found the Most Hints for their Items", MudBlazor.Icons.Material.Filled.Signpost));
+            }
+
+            // Medal: Keeper of Secrets
+            var keeperOfSecrets = Archipelago.Slots.GetValueOrDefault(_mostRefPlayer.Key);
+            if (keeperOfSecrets != null)
+            {
+                keeperOfSecrets.Medals.Add(new Medal("Keeper of Secrets", "Was Referenced the Most in Hints", MudBlazor.Icons.Material.Filled.People));
+            }
         }
     }
 }

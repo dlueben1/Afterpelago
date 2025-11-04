@@ -11,6 +11,19 @@
                             <MudText Typo="Typo.subtitle1">Game: @player.Value.Game.FriendlyName</MudText>
                         </MudItem>
                         <MudItem xs="12" sm="6">
+                            <MudList T="string">
+                                <MudListSubheader>
+                                    Medals
+                                </MudListSubheader>
+                                @foreach (var medal in player.Value.Medals)
+                                {
+                                    <MudListItem Text="@medal.Name" SecondaryText="@medal.Description" Icon="@medal.Icon" />
+                                }
+                                @if(player.Value.Medals.Count == 0)
+                                {
+                                    <MudListItem Text="No Medals Earned" />
+                                }
+                            </MudList>
                         </MudItem>
                     </MudGrid>
                 </MudExpansionPanel>

@@ -88,7 +88,8 @@ namespace Afterpelago.Utilities
 
         private static readonly ITracker[] trackers = new ITracker[]
         {
-            new HintTracker()
+            new HintTracker(),
+            new ReleaseTracker()
         };
 
         #endregion
