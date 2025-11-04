@@ -131,7 +131,7 @@ namespace Afterpelago.Trackers
             var keeperOfSecrets = Archipelago.Slots.GetValueOrDefault(_mostRefPlayer.Key);
             if (keeperOfSecrets != null)
             {
-                keeperOfSecrets.Medals.Add(new Medal("Keeper of Secrets", "Was Referenced the Most in Hints", MudBlazor.Icons.Material.Filled.People));
+                keeperOfSecrets.Medals.Add(new Medal("Keeper of Secrets", "Their World had the most Items referenced in Hints", MudBlazor.Icons.Material.Filled.GpsFixed));
             }
         }
     }

@@ -3,6 +3,6 @@
     public class Item
     {
         public string Name { get; set; }
-        public Slot Slot { get; set; }
+        public byte[] Image { get; set; }
     }
 }

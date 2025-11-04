@@ -2,10 +2,10 @@
 
 @using Afterpelago.Utilities
 
-<main class="centered">
+<main class="centered full-size">
     <h1>Let's Get Started</h1>
     <p>To get started, we're going to need some information from you</p>
-    <MudPaper Outlined Style="min-width: 30%; min-height: 30%; margin-top: 4em;">
+    <MudPaper Outlined Style="min-width: 30%; min-height: 30%; margin-top: 4em; padding: 0.5em;">
         <MudStepper Vertical OnPreviewInteraction="OnPreviewNavigation">
             <ChildContent>
 
@@ -40,14 +40,26 @@
                 </MudStep>
 
                 <!-- Step 2: Get Game Data -->
-                <MudStep Title="Obtain Game Information">
+                <MudStep Title="Verify Games Detected">
                     <h2>Detected Games</h2>
-                    @foreach(var game in Archipelago.Games.Values)
-                    {
-                        <MudText>@game.RealName</MudText>
-                    }
+                    <MudList T="string">
+                        @foreach(var game in Archipelago.Games.Values)
+                        {
+                            <MudListItem 
+                                Text="@game.RealName" 
+                                SecondaryText="@(game.IsSupported ? "Built-In Support for PopTracker Icons" : "Unknown Game - Not All Features Available")" 
+                                Icon="@(game.IsSupported ? MudBlazor.Icons.Material.Filled.CheckCircle : MudBlazor.Icons.Material.Filled.WarningAmber)"
+                                IconColor="@(game.IsSupported ? MudBlazor.Color.Success : MudBlazor.Color.Warning)"
+                                />
+                        }
+                    </MudList>
                 </MudStep>
 
+                <!-- Step 3: Download Game Data -->
+                <MudStep Title="Obtain Game Information">
+                    <MudText Typo="Typo.subtitle2" Align="MudBlazor.Align.Center">@DownloadStatusText</MudText>
+                    <MudProgressLinear Color="MudBlazor.Color.Secondary" Striped="true" Size="MudBlazor.Size.Large" Value="@DownloadStatusPercent" Class="my-7 mx-2" />
+                </MudStep>
             </ChildContent>
 
             <!-- Final Step: Should only be seen while loading, for a brief moment -->

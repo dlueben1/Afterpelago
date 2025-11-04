@@ -10,6 +10,9 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.full-size {
     width: 100vw;
     height: 100vh;
     min-height: 100vh;
@@ -22,6 +25,13 @@ body {
 
 .validation-message {
     color: red;
+}
+
+.no-select {
+    -webkit-user-select: none; /* Safari, Chrome, Opera */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Standard syntax */
 }
 
 #blazor-error-ui {

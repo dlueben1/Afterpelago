@@ -1,8 +1,10 @@
 ﻿using Afterpelago.Layout;
+using Afterpelago.Models;
 using Afterpelago.Utilities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
+using System.Net.Http.Json;
 
 namespace Afterpelago.Pages.Setup
 {
@@ -35,6 +37,9 @@ namespace Afterpelago.Pages.Setup
         /// </summary>
         private string LogUploadIcon = Icons.Material.Filled.CloudUpload;
 
+        private string DownloadStatusText = "Preparing to download game data...";
+        private int DownloadStatusPercent = 0;
+
         #region File IO Handlers
 
         /// <summary>
@@ -47,11 +52,63 @@ namespace Afterpelago.Pages.Setup
             LogFileStatus = LogUploadStatus.Processing;
             LogUploadIcon = "";
 
+            // Read the Log
             await LogManager.ReadFromFile(file);
+
+            // See what information we have on each game detected
+            await GetInternalGameInfo();
 
             // Set flags for completion
             LogFileStatus = LogUploadStatus.Completed;
             LogUploadIcon = Icons.Material.Filled.CheckCircle;
+        }
+
+        #endregion
+
+        #region Obtain Game Metadata
+
+        private async Task GetInternalGameInfo()
+        {
+            using(var _http = new HttpClient())
+            {
+                // Grab our internal list of known games
+                var knownGames = await _http.GetFromJsonAsync<List<KnownGameData>>($"{NavManager.BaseUri}/data/supportedGames.json");
+
+                // Back out if this fails (it shouldn't since it's a static bundled file)
+                if (knownGames == null || knownGames.Count == 0) return;
+
+                // Apply known game data to each detected game
+                foreach (var game in Archipelago.Games.Values)
+                {
+                    var matchedGame = knownGames.FirstOrDefault(kg => kg.RealName == game.RealName);
+                    if (matchedGame != null)
+                    {
+                        game.ApplyKnownGameData(matchedGame);
+                    }
+                }
+            }
+        }
+
+        private async Task DownloadGameData()
+        {
+            foreach(var game in Archipelago.Games.Values)
+            {
+                // Ignore if the game does not have known data
+                if (!game.IsSupported) continue;
+
+                // Update Download Status
+                DownloadStatusText = $"Downloading Tracker data for {game.FriendlyName}...";
+                DownloadStatusPercent = 0;
+                StateHasChanged();
+                try
+                {
+                    await GitHubUtility.DownloadTrackerData(game);
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine($"Error downloading data for {game.FriendlyName}: {ex.Message}");
+                }
+            }
         }
 
         #endregion
@@ -86,8 +143,15 @@ namespace Afterpelago.Pages.Setup
                             }
                             break;
                         }
-                    // Step 2: Obtain Game Data
+                    // Step 2: Verify Games
                     case 1:
+                        {
+                            // Begin downloading data
+                            await DownloadGameData();
+                            break;
+                        }
+                    // Step 3: Download Game Data
+                    case 2:
                         {
                             Archipelago.SetupComplete = true;
                             NavManager.NavigateTo("/report/dashboard");

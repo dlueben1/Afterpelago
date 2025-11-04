@@ -28,10 +28,39 @@ namespace Afterpelago.Models
         }
         private string friendlyName = string.Empty;
 
+        public string OriginalSystem { get; set; } = "Unknown";
+
+        public string CoverSource { get; set; } = string.Empty;
+        public int? CoverCode { get; set; } = null;
+        public string APTrackerSource { get; set; } = string.Empty;
+
         public Game(string name)
         {
             RealName = name;
         }
+
+        #region Game Metadata
+
+        public void ApplyKnownGameData(KnownGameData knownGame)
+        {
+            if (knownGame == null) return;
+            IsSupported = true;
+            friendlyName = knownGame.FriendlyName != null ? knownGame.FriendlyName : string.Empty;
+            RealName = knownGame.RealName;
+            OriginalSystem = knownGame.System;
+            CoverSource = knownGame.CoverSource;
+            CoverCode = knownGame.CoverCode;
+            APTrackerSource = knownGame.APTrackerSource;
+        }
+
+        /// <summary>
+        /// Whether the game is Supported by Afterpelago by default
+        /// </summary>
+        public bool IsSupported { get; set; }
+
+        #endregion
+
+        #region Comparison / Uniqueness
 
         /// <summary>
         /// We can assume, for the sake of simplicity, that what makes a game unique is it's real name.
@@ -60,5 +89,7 @@ namespace Afterpelago.Models
             }
             return false;
         }
+
+        #endregion
     }
 }
