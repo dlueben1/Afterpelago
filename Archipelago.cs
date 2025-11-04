@@ -2,6 +2,7 @@
 global using Check = Afterpelago.Models.CheckObtainedLogEntry;
 
 using Afterpelago.Models;
+using Afterpelago.Models.Statistics;
 
 namespace Afterpelago
 {
@@ -26,6 +27,8 @@ namespace Afterpelago
         /// All checks in the game session, in the order they were obtained
         /// </summary>
         public static Check[] Checks { get; set; } = Array.Empty<Check>();
+
+        public static HintLogEntry[] Hints { get; set; } = Array.Empty<HintLogEntry>();
 
         public static TimeSpan TotalActivePlaytime { get; set; }
     }

@@ -9,6 +9,7 @@ namespace Afterpelago.Models
         PlayerConnection,
         PlayerDisconnect,
         CheckFound,
+        Hint,
         Release,
         ServerShutdown
     }
@@ -29,6 +30,34 @@ namespace Afterpelago.Models
         public required string Message { get; set; }
         [DataMember]
         public LogEntryType Category { get; set; }
+    }
+
+    [DataContract]
+    public class HintLogEntry : LogEntry
+    {
+        [DataMember]
+        public required string SenderName { get; set; }
+        [DataMember]
+        public required string ReceiverName { get; set; }
+        [DataMember]
+        public required string ItemName { get; set; }
+        [DataMember]
+        public required string LocationName { get; set; }
+        [DataMember]
+        public required string Priority { get; set; }
+
+        [IgnoreDataMember]
+        public string UniqueId => $"{ReceiverName}:{ItemName}:{LocationName}:{SenderName}";
+
+        public override int GetHashCode()
+        {
+            return UniqueId.GetHashCode();
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return (obj is HintLogEntry) ? (UniqueId == ((HintLogEntry)obj).UniqueId) : false;
+        }
     }
 
     [DataContract]
@@ -121,6 +150,9 @@ namespace Afterpelago.Models
         public int ObtainedOrder { get; set; }
 
         [IgnoreDataMember]
+        public string UniqueId => $"{ReceiverName}:{ItemName}:{LocationName}:{SenderName}";
+
+        [IgnoreDataMember]
         public bool IsSelfCollection
         {
             get
@@ -158,6 +190,16 @@ namespace Afterpelago.Models
         public CheckObtainedLogEntry()
         {
             Category = LogEntryType.CheckFound;
+        }
+
+        public override int GetHashCode()
+        {
+            return UniqueId.GetHashCode();
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return (obj is Check) ? (UniqueId == ((Check)obj).UniqueId) : false;
         }
     }
 }

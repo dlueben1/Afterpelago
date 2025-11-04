@@ -1,13 +1,20 @@
 ﻿@page "/report/players"
 
-<article style="display: flex; flex-direction: row; padding: 4em;" Class="mt-16">
-    <MudGrid>
-        <MudItem xs="12">
-            <MudPaper>
-                <MudText Typo="Typo.h5">Multiworld General Statistics</MudText>
-                <MudText Typo="Typo.body1">Detailed statistics and information about the entire Multiworld session.</MudText>
-                <!-- Add more detailed statistics and visualizations here -->
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
+<article style="display: flex; flex-direction: row; padding: 4em; overflow-y: auto; max-height: 90vh;" Class="mt-16">
+    <MudStack Style="width: 100%;">
+        <MudExpansionPanels MultiExpansion="true">
+            @foreach (var player in Archipelago.Slots)
+            {
+                <MudExpansionPanel Text="@player.Value.PlayerName">
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                            <MudText Typo="Typo.subtitle1">Game: @player.Value.Game.FriendlyName</MudText>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                        </MudItem>
+                    </MudGrid>
+                </MudExpansionPanel>
+            }
+        </MudExpansionPanels>
+    </MudStack>
 </article>

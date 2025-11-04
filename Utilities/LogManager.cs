@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Afterpelago.Models;
 using System.Text.RegularExpressions;
 using System.Security.AccessControl;
+using Afterpelago.Trackers;
 
 namespace Afterpelago.Utilities
 {
@@ -36,6 +37,18 @@ namespace Afterpelago.Utilities
                  ReceiverName = m.Groups["receiver"].Value,
                  ItemName = m.Groups["item"].Value,
                  LocationName = m.Groups["location"].Value
+             }),
+            // Hint Received Entry
+            (new Regex(@"^Notice \(Team #(?<team>\d+)\): \[Hint\]: (?<receiver>.+?)'s (?<item>.+?) is at (?<location>.+?) in (?<sender>.+?)'s World\. \((?<priority>.+?)\)$", RegexOptions.Compiled),
+             (Match m) => new HintLogEntry
+             {
+                 Message = m.Value,
+                 Category = LogEntryType.Hint,
+                 SenderName = m.Groups["sender"].Value,
+                 ReceiverName = m.Groups["receiver"].Value,
+                 ItemName = m.Groups["item"].Value,
+                 LocationName = m.Groups["location"].Value,
+                 Priority = m.Groups["priority"].Value
              }),
             // Player Connection Entry
             (new Regex(@"^Notice \(all\): (?<player>.+?) \(Team #\d+\) playing (?<game>.+?) has joined\. Client\((?<version>\d+\.\d+\.\d+)\), \[(?<array>(?:'[^']*'(?:, )?)*)\]\.$", RegexOptions.Compiled),
@@ -71,6 +84,15 @@ namespace Afterpelago.Utilities
 
         #endregion
 
+        #region Statistic Trackers
+
+        private static readonly ITracker[] trackers = new ITracker[]
+        {
+            new HintTracker()
+        };
+
+        #endregion
+
         #region Reading a Log File
 
         /// <summary>
@@ -96,10 +118,12 @@ namespace Afterpelago.Utilities
                     // Buffer for all checks, which will eventually be converted into an Array for read speed
                     var checks = new List<Check>();
 
+                    // Buffer for all hints, which will eventually be converted into an Array for read speed
+                    var hints = new List<HintLogEntry>();
+
                     // Buffer to keep track of total seconds of active gameplay, and number of actives players needed to access
                     ulong totalActiveSeconds = 0;
-                    var _activePlayers = 0;
-                    DateTime _activeStart = DateTime.MinValue;
+                    DateTime _sessionStart = DateTime.MinValue;
 
                     // Keep reading lines until the end of the file
                     while ((line = await sr.ReadLineAsync()) != null)
@@ -116,17 +140,18 @@ namespace Afterpelago.Utilities
                         // Cache the line for the in-memory log file
                         lines.Add(entry);
 
+                        // If the session start time is minimum, update it with this value
+                        if (_sessionStart == DateTime.MinValue) _sessionStart = entry.Timestamp;
+
                         // Parse the entry for any additional data if needed (running this here to cut down on repeated searches, which we do enough of later)
+                        for(int i = 0; i < trackers.Length; i++)
+                        {
+                            trackers[i].ParseLine(entry);
+                        }
                         switch (entry.Category)
                         {
                             case LogEntryType.PlayerConnection:
                             {
-                                // If there are no active players at this point, mark the start time
-                                if(_activePlayers == 0) _activeStart = entry.Timestamp;
-
-                                // Keep track of the number of connected players
-                                _activePlayers++;
-
                                 // Grab the details, and make sure it's not null (even though it shouldn't be, since we just matched it)
                                 var details = entry as ConnectionLogEntry;
                                 if (details == null) break;
@@ -145,26 +170,13 @@ namespace Afterpelago.Utilities
 
                                 break;
                             }
-                            case LogEntryType.PlayerDisconnect:
-                            {
-                                // Decrement the number of connected players
-                                _activePlayers--;
-
-                                // If there are no active players, add to the total active time
-                                if(_activePlayers == 0)
-                                {
-                                    var span = entry.Timestamp - _activeStart;
-                                    totalActiveSeconds += (ulong)Math.Truncate(span.TotalSeconds);
-                                }
-
-                                break;
-                            }
                             case LogEntryType.ServerShutdown:
                             {
-                                _activePlayers = 0; 
-                                var span = entry.Timestamp - _activeStart;
-                                _activeStart = entry.Timestamp;
+                                var span = entry.Timestamp - _sessionStart;
                                 totalActiveSeconds += (ulong)Math.Truncate(span.TotalSeconds);
+
+                                // Reset the session timer
+                                _sessionStart = DateTime.MinValue;
                                 break;
                             }
                             case LogEntryType.CheckFound:
@@ -172,6 +184,7 @@ namespace Afterpelago.Utilities
                                 // Grab the details, and make sure it's not null (even though it shouldn't be, since we just matched it)
                                 var details = entry as CheckObtainedLogEntry;
                                 if (details == null) break;
+
 
                                 // Keep track of the order in which these checks were obtained
                                 details.ObtainedOrder = checks.Count + 1;
@@ -181,22 +194,34 @@ namespace Afterpelago.Utilities
 
                                 break;
                             }
+                            case LogEntryType.Hint:
+                            {
+                                hints.Add((HintLogEntry)entry);
+                                break;
+                            }
                         }
                     }
 
                     // Once we're at the end of the log file, let's add in the remaining active play time
-                    if(_activePlayers > 0)
+                    if(_sessionStart != DateTime.MinValue)
                     {
-                        var finalSpan = lines[lines.Count - 2].Timestamp - _activeStart;
+                        var finalSpan = lines[lines.Count - 2].Timestamp - _sessionStart;
                         totalActiveSeconds += (ulong)Math.Truncate(finalSpan.TotalSeconds);
                     }
 
                     // Store the total Active Play Time
                     Archipelago.TotalActivePlaytime = TimeSpan.FromSeconds(totalActiveSeconds);
 
-                    // Convert the log file and collection of checks into arrays for faster read access
+                    // Convert the log file and log entries for faster read access
                     rawLogs = lines.ToArray();
                     Archipelago.Checks = checks.ToArray();
+                    Archipelago.Hints = hints.ToArray();
+
+                    // Save all the calculated statistics from the trackers
+                    for (int i = 0; i < trackers.Length; i++)
+                    {
+                        trackers[i].Save();
+                    }
                 }
             }
         }

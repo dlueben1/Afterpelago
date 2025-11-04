@@ -17,12 +17,32 @@ namespace Afterpelago.Pages.Report
         public string LastCheck { get; set; }
         public string LastCheckClear { get; set; }
 
+        public string FastestPayoffText
+        {
+            get
+            {
+                return Statistics.Hints.FastestPayoff != null
+                    ? $"{Statistics.Hints.FastestPayoff.ReceiverName}'s {Statistics.Hints.FastestPayoff.ItemName} took {Statistics.Hints.FastestPayoff.SenderName} {Statistics.Hints.TimeToFulfillHints[Statistics.Hints.FastestPayoff.UniqueId].ToReadableString()} to fulfill upon seeing the hint"
+                    : "N/A";
+            }
+        }
+
+        public string LongestPayoffText
+        {
+            get
+            {
+                return Statistics.Hints.LongestPayoff != null
+                    ? $"{Statistics.Hints.LongestPayoff.ReceiverName}'s {Statistics.Hints.LongestPayoff.ItemName} took {Statistics.Hints.LongestPayoff.SenderName} {Statistics.Hints.TimeToFulfillHints[Statistics.Hints.LongestPayoff.UniqueId].ToReadableString()} to fulfill upon seeing the hint"
+                    : "N/A";
+            }
+        }
+
         protected override void OnInitialized()
         {
             base.OnInitialized();
 
             // Calculate and clean statistics
-            ActivePlayTime = TimeUtilities.TimespanToReadableString(Archipelago.TotalActivePlaytime);
+            ActivePlayTime = Archipelago.TotalActivePlaytime.ToReadableString();
 
             var _firstCheck = Archipelago.Checks[0];
             FirstCheck = $"{_firstCheck.SenderName}: {_firstCheck.LocationName}";

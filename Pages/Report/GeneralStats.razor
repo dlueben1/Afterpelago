@@ -1,7 +1,7 @@
 ﻿@page "/report/general"
 @using Afterpelago.Utilities
 
-<article style="display: flex; flex-direction: row; padding: 4em;" Class="mt-16">
+<article style="display: flex; flex-direction: row; padding: 4em; overflow-y: auto; max-height: 90vh;" Class="mt-16">
     <MudStack Style="width: 100%;">
         <MudCard Style="width: 100%;">
             <MudCardHeader>
@@ -11,14 +11,32 @@
             </MudCardHeader>
             <MudCardContent>
                 <MudList T="string">
-                    <MudListItem Text="Active Playtime (Not Working)" SecondaryText="@ActivePlayTime" />
+                    <MudListSubheader>
+                        Play Time
+                    </MudListSubheader>
+                    <MudListItem Text="Active Playtime" SecondaryText="@ActivePlayTime" />
                     <MudListItem Text="Start Time" SecondaryText="@StartTime" />
                     <MudListItem Text="End Time" SecondaryText="@EndTime" />
                     <MudDivider />
+                    <MudListSubheader>
+                        Checks
+                    </MudListSubheader>
+                    <MudListItem Text="Total Checks Sent" SecondaryText="@Archipelago.Checks.Length.ToString()" />
                     <MudListItem Text="First Check (Location)" SecondaryText="@FirstCheck" />
                     <MudListItem Text="First Check (Time)" SecondaryText="@FirstCheckClear" />
                     <MudListItem Text="Last Check (Location)" SecondaryText="@LastCheck" />
                     <MudListItem Text="Last Check (Time)" SecondaryText="@LastCheckClear" />
+                    <MudDivider />
+                    <MudListSubheader>
+                        Hints
+                    </MudListSubheader>
+                    <MudListItem Text="Total Hints Obtained" SecondaryText="@Statistics.Hints.TotalHintCount.ToString()" />
+                    <MudListItem Text="Player with the most Hints" SecondaryText="@Statistics.Hints.PlayerWithMostHints" />
+                    <MudListItem Text="Player with the Most Hint Locations" SecondaryText="@Statistics.Hints.PlayerMostReferencedInHints" />
+                    <MudListItem Text="First Hint Was For" SecondaryText="@(Statistics.Hints.TotalHintCount == 0 ? "N/A" : $"{Statistics.Hints.FirstHint.ReceiverName}'s {Statistics.Hints.FirstHint.ItemName}")" />
+                    <MudListItem Text="First Hint Found At" SecondaryText="@(Statistics.Hints.TotalHintCount == 0 ? "N/A" : Statistics.Hints.FirstHint.Timestamp.ToString())" />
+                    <MudListItem Text="Most Helpful Hint (Fastest Payoff)" SecondaryText="@FastestPayoffText" />
+                    <MudListItem Text="Most Difficult Hint (Longest Payoff)" SecondaryText="@LongestPayoffText" />
                 </MudList>
             </MudCardContent>
         </MudCard>
