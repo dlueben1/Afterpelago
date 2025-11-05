@@ -1,10 +1,12 @@
 ﻿using Afterpelago.Models;
 using Afterpelago.Serializers;
 using Afterpelago.Services;
+using Afterpelago.Utilities;
 using ApexCharts;
 using BlazorWorker.BackgroundServiceFactory;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using System.Linq;
 using System.Threading.Tasks;
 using static MudBlazor.Icons;
 
@@ -12,12 +14,9 @@ namespace Afterpelago.Components
 {
     public partial class ChecksChart
     {
-        [Parameter]
-        public required CheckObtainedLogEntry[] Checks { get; set; }
-
         private ApexChart<Check> ChartRef;
 
-        private List<Check> Data { get; set; } = new();
+        private List<Check> Data { get; set; } = Archipelago.Checks.SkipLast(1).ToList();
 
         public bool HasLoaded { get; private set; } = true;
 
@@ -35,20 +34,6 @@ namespace Afterpelago.Components
                 {
                     Text = "Time Obtained"
                 }
-            },
-            Annotations = new Annotations
-            {
-                Images = new List<AnnotationsImage>
-                {
-                    new AnnotationsImage
-                    {
-                        Path = "https://afterpelagodata.blob.core.windows.net/web/banjotooie/images/items/jiggy.webp",
-                        Width = 12,
-                        Height = 12,
-                        X = 200,
-                        Y = 200
-                    }
-                }
             }
         };
 
@@ -56,34 +41,68 @@ namespace Afterpelago.Components
         {
             base.OnInitialized();
 
-            // Last value is invalid, usually (@todo fix this? it's faster than Where(<dt valid>) though)
-            var checks = Checks.SkipLast(1).ToList();
+            // Build "Release" Annotations
+            List<AnnotationsXAxis> releaseAnnotations = new List<AnnotationsXAxis>();
+            for (int i = 0; i < Archipelago.Releases.Length; i++)
+            {
+                var release = Archipelago.Releases[i];
+                releaseAnnotations.Add(new AnnotationsXAxis
+                {
+                    X = release.Timestamp.ToUnixTimeMilliseconds(),
+                    BorderColor = "yellow",
+                    Label = new Label
+                    {
+                        BorderColor = "yellow",
+                        Style = new Style
+                        {
+                            Background = "yellow"
+                        },
+                        Text = $"{release.SlotName} Cleared!"
+                    }
+                });
+            }
 
-            // Store Data
-            Data = checks;
-        }
-
-        protected async Task OnRender()
-        {
-            //// Get the data
-            //if(ChartRef != null)
-            //{
-            //    if(ChartRef.Series.Count > 0)
-            //    {
-            //        var points = ChartRef.Series[0].GenerateDataPoints(Data);
-            //        foreach(var point in points)
-            //        {
-            //            ChartOptions.Annotations.Images.Add(new AnnotationsImage
-            //            {
-            //                Path = "https://afterpelagodata.blob.core.windows.net/web/banjotooie/images/items/jiggy.webp",
-            //                Width = 12,
-            //                Height = 12,
-            //                X = 200,
-            //                Y = 200
-            //            })
-            //        }
-            //    }
-            //}
+            // Apply Annotations
+            var checkPoints = new List<AnnotationsPoint>();
+            Archipelago.Checks.SkipLast(1).ToList().ForEach(check =>
+            {
+                // Is this an item with an image?
+                var player = check.Receiver;
+                if(player != null && player.Game.Items.ContainsKey(check.ItemName))
+                {
+                    var item = player.Game.Items[check.ItemName];
+                    var annotation = new AnnotationsPoint
+                    {
+                        X = check.Timestamp.ToUnixTimeMilliseconds(),//(new DateTime(check.Timestamp.Ticks).AddHours(3)).ToUnixTimeMilliseconds(),
+                        Y = check.ObtainedOrder
+                    };
+                    if(item.ImageEndpoint != null)
+                    {
+                        annotation.Image = new AnnotationsPointImage
+                        {
+                            Path = player.Game.Items[check.ItemName].ImageEndpoint,
+                            Width = 32,
+                            Height = 32
+                        };
+                    }
+                    else
+                    {
+                        annotation.Marker = new AnnotationMarker
+                        {
+                            Size = 6,
+                            FillColor = "blue",
+                            StrokeColor = "navy",
+                            Shape = AnnotationMarkerShape.Circle
+                        };
+                    }
+                    checkPoints.Add(annotation);
+                }
+            });
+            ChartOptions.Annotations = new Annotations
+            {
+                Xaxis = releaseAnnotations,
+                Points = checkPoints
+            };
         }
 
         public MarkupString ShowTooltip(Check check)

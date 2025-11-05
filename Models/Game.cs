@@ -43,7 +43,7 @@ namespace Afterpelago.Models
         public string CoverSource { get; set; } = string.Empty;
         public int? CoverCode { get; set; } = null;
         public string APTrackerSource { get; set; } = string.Empty;
-        public Item[] Items { get; set; } = Array.Empty<Item>();
+        public Dictionary<string, Item> Items { get; set; } = new Dictionary<string, Item>();
 
         public Game(string name)
         {
@@ -66,10 +66,21 @@ namespace Afterpelago.Models
             var itemsPath = Path.Combine(blobPath, "items.json");
             using(var httpClient = new HttpClient())
             {
-                Items = await httpClient.GetFromJsonAsync<Item[]>(itemsPath) ?? [];
-                for(int i = 0; i < Items.Length; i++)
+                var _items = await httpClient.GetFromJsonAsync<Item[]>(itemsPath) ?? [];
+                for(int i = 0; i < _items.Length; i++)
                 {
-                    Items[i].Parent = this;
+                    // Update the parent
+                    _items[i].Parent = this;
+
+                    // Add to our dictionary
+                    if (!Items.ContainsKey(_items[i].Name)) Items.Add(_items[i].Name, _items[i]);
+
+                    // If the word seems plural, create an alias that's singular
+                    if (_items[i].Name.EndsWith('s'))
+                    {
+                        var singularName = _items[i].Name.TrimEnd('s');
+                        if (!Items.ContainsKey(singularName)) Items.Add(singularName, _items[i]);
+                    }
                 }
             }
         }

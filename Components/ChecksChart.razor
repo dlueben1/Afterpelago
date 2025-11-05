@@ -9,7 +9,6 @@
 <ApexChart TItem="Check"
            Title="Checks Over Time"
            Options="ChartOptions"
-           OnRendered="@OnRender"
            @ref="ChartRef">
 
     <ApexPointTooltip>
@@ -22,8 +21,8 @@
         <ApexPointSeries TItem="Check"
                          Items="Data"
                          Name="Checks"
-                         SeriesType="SeriesType.Line"
-                         XValue="e => e.Timestamp"
+                         SeriesType="SeriesType.Area"
+                         XValue="e => e.Timestamp.ToUnixTimeMilliseconds()"
                          YValue="e => e.ObtainedOrder" />
     </ChildContent>
 </ApexChart>

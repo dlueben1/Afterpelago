@@ -37,7 +37,7 @@ namespace Afterpelago.Trackers
                 Item? firstItem = null;
                 if (player.Game.IsSupported && player.Game.Items != null)
                 {
-                    firstItem = player.Game.Items.FirstOrDefault(i => i.Name == kvp.Value);
+                    firstItem = player.Game.Items.ContainsKey(kvp.Value) ? player.Game.Items[kvp.Value] : null;
                 }
                 player.FirstItemReceived = firstItem ?? new Item { Name = kvp.Value, Type = "Unknown", Img = string.Empty };
                 player.FirstItemLogEntry = firstItem_Checks[player.PlayerName];
