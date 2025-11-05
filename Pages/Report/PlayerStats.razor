@@ -6,9 +6,26 @@
             @foreach (var player in Archipelago.Slots)
             {
                 <MudExpansionPanel Text="@player.Value.PlayerName">
+                    <MudText Typo="Typo.subtitle1">Game: @player.Value.Game.FriendlyName</MudText>
                     <MudGrid>
                         <MudItem xs="12" sm="6">
-                            <MudText Typo="Typo.subtitle1">Game: @player.Value.Game.FriendlyName</MudText>
+                            <MudList T="string">
+                                <MudListSubheader>
+                                    Checks
+                                </MudListSubheader>
+                                <MudListItem Text="First Item Received" SecondaryText="@($"{player.Value.FirstItemReceived?.Name} from {player.Value.FirstItemLogEntry.SenderName}")">
+                                    <AvatarContent>
+                                        @if(!string.IsNullOrEmpty(player.Value.FirstItemReceived.Img))
+                                        {
+                                            <img src="@player.Value.FirstItemReceived.ImageEndpoint" width="48" height="48" />
+                                        }
+                                        else
+                                        {
+                                            <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" />
+                                        }
+                                    </AvatarContent>
+                                </MudListItem>
+                            </MudList>
                         </MudItem>
                         <MudItem xs="12" sm="6">
                             <MudList T="string">

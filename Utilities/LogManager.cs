@@ -89,7 +89,8 @@ namespace Afterpelago.Utilities
         private static readonly ITracker[] trackers = new ITracker[]
         {
             new HintTracker(),
-            new ReleaseTracker()
+            new ReleaseTracker(),
+            new ItemTracker()
         };
 
         #endregion
@@ -103,7 +104,7 @@ namespace Afterpelago.Utilities
         /// <!-- @todo cut down on repeated code around total active playtime -->
         /// <!-- @todo in the future there has got to be a way to make dynamic handlers so it isn't a giant function -->
         /// <param name="file">The Log File passed in from the UI</param>
-        public static async Task ReadFromFile(IBrowserFile file)
+        public static async Task ReadFromFile(IBrowserFile file, Func<Task> getGameData)
         {
             // Open the file as a StreamReader as process all lines into Afterpelago (max file size: 1.5GB)
             using (var stream = file.OpenReadStream(maxAllowedSize: 1610612736))
@@ -217,6 +218,9 @@ namespace Afterpelago.Utilities
                     rawLogs = lines.ToArray();
                     Archipelago.Checks = checks.ToArray();
                     Archipelago.Hints = hints.ToArray();
+
+                    // Get the internal game data for all detected games before applying data from the trackers
+                    await getGameData();
 
                     // Save all the calculated statistics from the trackers
                     for (int i = 0; i < trackers.Length; i++)

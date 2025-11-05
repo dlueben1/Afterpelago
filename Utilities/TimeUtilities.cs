@@ -4,8 +4,6 @@
     {
         public static string ToReadableString(this TimeSpan span)
         {
-            Console.WriteLine("BEFORE: " + span.ToString());
-            Console.WriteLine("BEFORE MILLISECONDS: " + span.TotalMilliseconds.ToString());
             string formatted = string.Format("{0}{1}{2}{3}",
                 span.Duration().Days > 0 ? string.Format("{0:0} day{1}, ", span.Days, span.Days == 1 ? string.Empty : "s") : string.Empty,
                 span.Duration().Hours > 0 ? string.Format("{0:0} hour{1}, ", span.Hours, span.Hours == 1 ? string.Empty : "s") : string.Empty,
@@ -16,7 +14,6 @@
 
             if (string.IsNullOrEmpty(formatted)) formatted = "0 seconds";
 
-            Console.WriteLine("AFTER" + formatted);
             return formatted;
         }
     }

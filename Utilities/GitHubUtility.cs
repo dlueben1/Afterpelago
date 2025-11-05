@@ -1,5 +1,6 @@
 ﻿using Afterpelago.Models;
 using Afterpelago.Models.Responses.GitHub;
+using ICSharpCode.SharpZipLib.Zip;
 using System.Net.Http.Json;
 
 namespace Afterpelago.Utilities
@@ -14,7 +15,7 @@ namespace Afterpelago.Utilities
                 throw new ArgumentException("Invalid game data.");
             }
 
-            // Make requests to GitHub
+            // The HTTP Client is used for standard API requests
             using (var httpClient = new HttpClient())
             {
                 // Step 1: Grab information about the latest release
@@ -24,8 +25,20 @@ namespace Afterpelago.Utilities
                     throw new Exception("Failed to retrieve Zipball URL from GitHub.");
                 }
 
-                // Step 2: Download the ZIP from the release info
+                // Step 2: Download the ZIP from the release info as a Byte Array
                 var zipData = await httpClient.GetByteArrayAsync(info.Zipball_URL);
+
+                // Step 3: Push the array into a MemoryStream and extract `items.json`
+                using (MemoryStream ms = new MemoryStream(zipData))
+                {
+                    using (ZipFile zip = new ZipFile(ms))
+                    {
+                        foreach(var file in zip)
+                        {
+                            Console.WriteLine("ZIP: " + file.ToString());
+                        }
+                    }
+                }
             }
         }
     }

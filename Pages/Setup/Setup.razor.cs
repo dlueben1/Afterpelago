@@ -53,10 +53,7 @@ namespace Afterpelago.Pages.Setup
             LogUploadIcon = "";
 
             // Read the Log
-            await LogManager.ReadFromFile(file);
-
-            // See what information we have on each game detected
-            await GetInternalGameInfo();
+            await LogManager.ReadFromFile(file, GetInternalGameInfo);
 
             // Set flags for completion
             LogFileStatus = LogUploadStatus.Completed;
@@ -80,33 +77,12 @@ namespace Afterpelago.Pages.Setup
                 // Apply known game data to each detected game
                 foreach (var game in Archipelago.Games.Values)
                 {
-                    var matchedGame = knownGames.FirstOrDefault(kg => kg.RealName == game.RealName);
+                    var matchedGame = knownGames.FirstOrDefault(kg => kg.Name == game.RealName);
                     if (matchedGame != null)
                     {
-                        game.ApplyKnownGameData(matchedGame);
+                        game.IsSupported = true;
+                        await game.DownloadBlobData();
                     }
-                }
-            }
-        }
-
-        private async Task DownloadGameData()
-        {
-            foreach(var game in Archipelago.Games.Values)
-            {
-                // Ignore if the game does not have known data
-                if (!game.IsSupported) continue;
-
-                // Update Download Status
-                DownloadStatusText = $"Downloading Tracker data for {game.FriendlyName}...";
-                DownloadStatusPercent = 0;
-                StateHasChanged();
-                try
-                {
-                    await GitHubUtility.DownloadTrackerData(game);
-                }
-                catch(Exception ex)
-                {
-                    Console.WriteLine($"Error downloading data for {game.FriendlyName}: {ex.Message}");
                 }
             }
         }
@@ -143,15 +119,8 @@ namespace Afterpelago.Pages.Setup
                             }
                             break;
                         }
-                    // Step 2: Verify Games
+                    // Step 2: Final Setup
                     case 1:
-                        {
-                            // Begin downloading data
-                            await DownloadGameData();
-                            break;
-                        }
-                    // Step 3: Download Game Data
-                    case 2:
                         {
                             Archipelago.SetupComplete = true;
                             NavManager.NavigateTo("/report/dashboard");

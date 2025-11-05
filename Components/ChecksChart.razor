@@ -8,7 +8,9 @@
 }
 <ApexChart TItem="Check"
            Title="Checks Over Time"
-           Options="ChartOptions">
+           Options="ChartOptions"
+           OnRendered="@OnRender"
+           @ref="ChartRef">
 
     <ApexPointTooltip>
         <div>

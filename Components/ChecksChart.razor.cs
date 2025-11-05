@@ -5,6 +5,7 @@ using ApexCharts;
 using BlazorWorker.BackgroundServiceFactory;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using System.Threading.Tasks;
 using static MudBlazor.Icons;
 
 namespace Afterpelago.Components
@@ -13,6 +14,8 @@ namespace Afterpelago.Components
     {
         [Parameter]
         public required CheckObtainedLogEntry[] Checks { get; set; }
+
+        private ApexChart<Check> ChartRef;
 
         private List<Check> Data { get; set; } = new();
 
@@ -32,6 +35,20 @@ namespace Afterpelago.Components
                 {
                     Text = "Time Obtained"
                 }
+            },
+            Annotations = new Annotations
+            {
+                Images = new List<AnnotationsImage>
+                {
+                    new AnnotationsImage
+                    {
+                        Path = "https://afterpelagodata.blob.core.windows.net/web/banjotooie/images/items/jiggy.webp",
+                        Width = 12,
+                        Height = 12,
+                        X = 200,
+                        Y = 200
+                    }
+                }
             }
         };
 
@@ -39,41 +56,39 @@ namespace Afterpelago.Components
         {
             base.OnInitialized();
 
-            // Last value is invalid, usually (@todo fix this? it's faster than where though)
-            Data = Checks.SkipLast(1).ToList();
+            // Last value is invalid, usually (@todo fix this? it's faster than Where(<dt valid>) though)
+            var checks = Checks.SkipLast(1).ToList();
+
+            // Store Data
+            Data = checks;
+        }
+
+        protected async Task OnRender()
+        {
+            //// Get the data
+            //if(ChartRef != null)
+            //{
+            //    if(ChartRef.Series.Count > 0)
+            //    {
+            //        var points = ChartRef.Series[0].GenerateDataPoints(Data);
+            //        foreach(var point in points)
+            //        {
+            //            ChartOptions.Annotations.Images.Add(new AnnotationsImage
+            //            {
+            //                Path = "https://afterpelagodata.blob.core.windows.net/web/banjotooie/images/items/jiggy.webp",
+            //                Width = 12,
+            //                Height = 12,
+            //                X = 200,
+            //                Y = 200
+            //            })
+            //        }
+            //    }
+            //}
         }
 
         public MarkupString ShowTooltip(Check check)
         {
-            return (MarkupString)$"<b>{check.SenderName}</b> found <b>{check.ItemName}</b> for <b>{check.ReceiverName}</b><br/>{check.LocationName}\n<br/>{check.Timestamp.ToShortDateString()} {check.Timestamp.ToShortTimeString()}";
-        }
-
-        /// <summary>
-        /// When the Component Mounts, build the Chart Data
-        /// </summary>
-        protected override async Task OnInitializedAsync()
-        {
-            //// Create the WebWorker for Async (I wish we had WASM Threads working...)
-            //var worker = await workerFactory.CreateAsync();
-
-            //// Create the service reference for the WebWorker
-            //var service = await worker.CreateBackgroundServiceAsync<ChartBuilderWebWorkerService>(options => options.UseCustomExpressionSerializer(typeof(CustomCheckSerializer)));
-
-            //// Build the chart series (and make a local reference to get around some scope shenanigans...)
-            //var scopeSafeChecks = this.Checks;
-            //var result = await service.RunAsync(s => s.BuildChartDataFromChecks(scopeSafeChecks));
-
-            //// If this worked, store it locally and force a refresh
-            //if(result != null)
-            //{
-            //    Data = result;
-            //    HasLoaded = true;
-            //    StateHasChanged();
-            //}
-
-            // Dispose of the WW
-            //await service.DisposeAsync();
-            //await worker.DisposeAsync();
+            return (MarkupString)$"<b>{check.SenderName}</b> found <b>{check.ItemName}</b> for <b>{check.ReceiverName}</b><br/>{$"(Found at {check.LocationName})"}\n<br/>{check.Timestamp.ToShortDateString()} {check.Timestamp.ToShortTimeString()}";
         }
     }
 }

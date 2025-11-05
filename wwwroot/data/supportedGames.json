@@ -1,9 +1,38 @@
 [
   {
-    "realName": "Banjo-Tooie",
-    "coverSource": "tgdb",
-    "coverCode": "176",
-    "apTrackerSource": "Ozone31/banjo-tooie-ap-tracker",
-    "system": "N64"
+    "name": "Banjo-Tooie",
+    "IsPtSupported": true
+  },
+  {
+    "name": "Dark Souls III",
+    "IsPtSupported": true
+  },
+  {
+    "name": "Sonic Adventure 2: Battle",
+    "IsPtSupported": true
+  },
+  {
+    "name": "The Legend of Zelda: The Wind Waker",
+    "IsPtSupported": true
+  },
+  {
+    "name": "Super Mario World",
+    "IsPtSupported": true
+  },
+  {
+    "name": "Super Mario 64",
+    "IsPtSupported": true
+  },
+  {
+    "name": "Kingdom Hearts 2",
+    "IsPtSupported": true
+  },
+  {
+    "name": "Pokemon Emerald",
+    "IsPtSupported": true
+  },
+  {
+    "name": "A Hat In Time",
+    "IsPtSupported": true
   }
 ]

@@ -3,11 +3,13 @@ using BlazorWorker.Core;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
+using static System.Net.WebRequestMethods;
 
 namespace Afterpelago
 {
     public class Program
     {
+        public static string BlobEndpoint = @"https://afterpelagodata.blob.core.windows.net/web/";
         public static async Task Main(string[] args)
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);

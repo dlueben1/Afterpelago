@@ -1,4 +1,6 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Net.Http.Json;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 
 namespace Afterpelago.Models
 {
@@ -28,11 +30,20 @@ namespace Afterpelago.Models
         }
         private string friendlyName = string.Empty;
 
+        public string DirectoryName
+        {
+            get
+            {
+                return Regex.Replace(RealName.ToLower(), "[^a-zA-Z0-9]", "");
+            }
+        }
+
         public string OriginalSystem { get; set; } = "Unknown";
 
         public string CoverSource { get; set; } = string.Empty;
         public int? CoverCode { get; set; } = null;
         public string APTrackerSource { get; set; } = string.Empty;
+        public Item[] Items { get; set; } = Array.Empty<Item>();
 
         public Game(string name)
         {
@@ -41,22 +52,27 @@ namespace Afterpelago.Models
 
         #region Game Metadata
 
-        public void ApplyKnownGameData(KnownGameData knownGame)
-        {
-            if (knownGame == null) return;
-            IsSupported = true;
-            friendlyName = knownGame.FriendlyName != null ? knownGame.FriendlyName : string.Empty;
-            RealName = knownGame.RealName;
-            OriginalSystem = knownGame.System;
-            CoverSource = knownGame.CoverSource;
-            CoverCode = knownGame.CoverCode;
-            APTrackerSource = knownGame.APTrackerSource;
-        }
-
         /// <summary>
         /// Whether the game is Supported by Afterpelago by default
         /// </summary>
         public bool IsSupported { get; set; }
+
+        public async Task DownloadBlobData()
+        {
+            // Build the blob path for our game
+            var blobPath = Path.Combine(Program.BlobEndpoint, DirectoryName);
+
+            // Grab the items.json file and process each supported item
+            var itemsPath = Path.Combine(blobPath, "items.json");
+            using(var httpClient = new HttpClient())
+            {
+                Items = await httpClient.GetFromJsonAsync<Item[]>(itemsPath) ?? [];
+                for(int i = 0; i < Items.Length; i++)
+                {
+                    Items[i].Parent = this;
+                }
+            }
+        }
 
         #endregion
 

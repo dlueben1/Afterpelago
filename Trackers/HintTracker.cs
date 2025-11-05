@@ -46,7 +46,6 @@ namespace Afterpelago.Trackers
             if (hintEntry == null) return;
 
             // Keep track of this hint to see when it gets paid off
-            if (!_pendingHints.ContainsKey(hintEntry.UniqueId)) Console.WriteLine($"ADDING PENDING HINT: {hintEntry.UniqueId}");
             if (!_pendingHints.ContainsKey(hintEntry.UniqueId)) _pendingHints.Add(hintEntry.UniqueId, hintEntry.Timestamp);
 
             // If this is the first hint, store it

@@ -23,6 +23,9 @@ namespace Afterpelago.Models
         [IgnoreDataMember]
         public List<Medal> Medals { get; private set; }
 
+        public Item FirstItemReceived { get; set; }
+        public Check FirstItemLogEntry { get; set; }
+
         public Slot(string name, Game game)
         {
             PlayerName = name;
