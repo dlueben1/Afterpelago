@@ -12,6 +12,18 @@
     "IsPtSupported": true
   },
   {
+    "name": "Yacht Dice",
+    "IsPtSupported": true
+  },
+  {
+    "name": "Ocarina of Time",
+    "IsPtSupported": true
+  },
+  {
+    "name": "Ship of Harkinian",
+    "IsPtSupported": true
+  },
+  {
     "name": "The Legend of Zelda: The Wind Waker",
     "IsPtSupported": true
   },
@@ -32,7 +44,7 @@
     "IsPtSupported": true
   },
   {
-    "name": "A Hat In Time",
+    "name": "A Hat in Time",
     "IsPtSupported": true
   }
 ]

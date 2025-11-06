@@ -90,7 +90,9 @@ namespace Afterpelago.Utilities
         {
             new HintTracker(),
             new ReleaseTracker(),
-            new ItemTracker()
+            new ItemTracker(),
+            // Must come after ReleaseTracker to get accurate active time
+            new ChecksPerHourTracker()
         };
 
         #endregion
@@ -146,66 +148,66 @@ namespace Afterpelago.Utilities
                         if (_sessionStart == DateTime.MinValue) _sessionStart = entry.Timestamp;
 
                         // Parse the entry for any additional data if needed (running this here to cut down on repeated searches, which we do enough of later)
-                        for(int i = 0; i < trackers.Length; i++)
+                        for (int i = 0; i < trackers.Length; i++)
                         {
                             trackers[i].ParseLine(entry);
                         }
                         switch (entry.Category)
                         {
                             case LogEntryType.PlayerConnection:
-                            {
-                                // Grab the details, and make sure it's not null (even though it shouldn't be, since we just matched it)
-                                var details = entry as ConnectionLogEntry;
-                                if (details == null) break;
-
-                                // Attempt to add the Game to the Archipelago Games list
-                                if (!Archipelago.Games.ContainsKey(details.GameName))
                                 {
-                                    Archipelago.Games[details.GameName] = new Game(details.GameName);
-                                }
+                                    // Grab the details, and make sure it's not null (even though it shouldn't be, since we just matched it)
+                                    var details = entry as ConnectionLogEntry;
+                                    if (details == null) break;
 
-                                // Attempt to add the player/slot to the Archipelago Slots list
-                                if (!Archipelago.Slots.ContainsKey(details.SlotName))
-                                {
-                                    Archipelago.Slots[details.SlotName] = new Slot(details.SlotName, Archipelago.Games[details.GameName]);
-                                }
+                                    // Attempt to add the Game to the Archipelago Games list
+                                    if (!Archipelago.Games.ContainsKey(details.GameName))
+                                    {
+                                        Archipelago.Games[details.GameName] = new Game(details.GameName);
+                                    }
 
-                                break;
-                            }
+                                    // Attempt to add the player/slot to the Archipelago Slots list
+                                    if (!Archipelago.Slots.ContainsKey(details.SlotName))
+                                    {
+                                        Archipelago.Slots[details.SlotName] = new Slot(details.SlotName, Archipelago.Games[details.GameName]);
+                                    }
+
+                                    break;
+                                }
                             case LogEntryType.ServerShutdown:
-                            {
-                                var span = entry.Timestamp - _sessionStart;
-                                totalActiveSeconds += (ulong)Math.Truncate(span.TotalSeconds);
+                                {
+                                    var span = entry.Timestamp - _sessionStart;
+                                    totalActiveSeconds += (ulong)Math.Truncate(span.TotalSeconds);
 
-                                // Reset the session timer
-                                _sessionStart = DateTime.MinValue;
-                                break;
-                            }
+                                    // Reset the session timer
+                                    _sessionStart = DateTime.MinValue;
+                                    break;
+                                }
                             case LogEntryType.CheckFound:
-                            {
-                                // Grab the details, and make sure it's not null (even though it shouldn't be, since we just matched it)
-                                var details = entry as CheckObtainedLogEntry;
-                                if (details == null) break;
+                                {
+                                    // Grab the details, and make sure it's not null (even though it shouldn't be, since we just matched it)
+                                    var details = entry as CheckObtainedLogEntry;
+                                    if (details == null) break;
 
 
-                                // Keep track of the order in which these checks were obtained
-                                details.ObtainedOrder = checks.Count + 1;
+                                    // Keep track of the order in which these checks were obtained
+                                    details.ObtainedOrder = checks.Count + 1;
 
-                                // Cache the check for later
-                                checks.Add(details);
+                                    // Cache the check for later
+                                    checks.Add(details);
 
-                                break;
-                            }
+                                    break;
+                                }
                             case LogEntryType.Hint:
-                            {
-                                hints.Add((HintLogEntry)entry);
-                                break;
-                            }
+                                {
+                                    hints.Add((HintLogEntry)entry);
+                                    break;
+                                }
                         }
                     }
 
                     // Once we're at the end of the log file, let's add in the remaining active play time
-                    if(_sessionStart != DateTime.MinValue)
+                    if (_sessionStart != DateTime.MinValue)
                     {
                         var finalSpan = lines[lines.Count - 2].Timestamp - _sessionStart;
                         totalActiveSeconds += (ulong)Math.Truncate(finalSpan.TotalSeconds);

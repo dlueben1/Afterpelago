@@ -1,4 +1,5 @@
 ﻿@page "/report/players"
+@using Afterpelago.Utilities
 
 <article style="display: flex; flex-direction: row; padding: 4em; overflow-y: auto; max-height: 90vh;" Class="mt-16">
     <MudStack Style="width: 100%;">
@@ -11,8 +12,16 @@
                         <MudItem xs="12" sm="6">
                             <MudList T="string">
                                 <MudListSubheader>
+                                    Player Info
+                                </MudListSubheader>
+                                <MudListItem Text="Total Active Time" SecondaryText="@(player.Value.ActiveTimeOnline.ToReadableString())" />
+                                <MudDivider />
+                                <MudListSubheader>
                                     Checks
                                 </MudListSubheader>
+                                <MudListItem Text="Average Checks Per Hour" SecondaryText="@player.Value.ChecksPerHour.ToString("F2")" />
+                                <MudListItem Text="Percentage of Checks Found before Release" SecondaryText="@($"{player.Value.PercentageOfChecksBeforeRelease.ToString("F2")}%")" />
+                                <MudListItem Text="# of Leftover Checks on Release" SecondaryText="@player.Value.EstimatedChecksFromRelease.ToString()" />
                                 <MudListItem Text="First Item Received" SecondaryText="@($"{player.Value.FirstItemReceived?.Name} from {player.Value.FirstItemLogEntry.SenderName}")">
                                     <AvatarContent>
                                         @if(!string.IsNullOrEmpty(player.Value.FirstItemReceived.Img))
