@@ -16,7 +16,7 @@ namespace Afterpelago.Components
     {
         private ApexChart<Check> ChartRef;
 
-        private List<Check> Data { get; set; } = Archipelago.Checks.SkipLast(1).ToList();
+        private List<Check> Data { get; set; }
 
         public bool HasLoaded { get; private set; } = true;
 
@@ -25,7 +25,7 @@ namespace Afterpelago.Components
             Chart = new Chart
             {
                 Type = ApexCharts.ChartType.Line,
-                Height = 350,
+                Height = 550,
                 Toolbar = new Toolbar
                 {
                     Tools = new Tools
@@ -46,12 +46,15 @@ namespace Afterpelago.Components
                 {
                     Text = "Time Obtained"
                 }
-            },
+            }
         };
 
         protected override void OnInitialized()
         {
             base.OnInitialized();
+
+            // Listen to the Search Service
+            SearchService.OnDataChanged += OnSearch;
 
             // Build "Release" Annotations
             List<AnnotationsXAxis> releaseAnnotations = new List<AnnotationsXAxis>();
@@ -117,9 +120,41 @@ namespace Afterpelago.Components
             };
         }
 
+        private async void OnSearch()
+        {
+            // Attempt to zoom into the searched item
+            var ts = SearchService.SearchItem.Timestamp;
+            await ChartRef.ZoomXAsync(ts.AddMinutes(-15).ToUnixTimeMilliseconds(), ts.AddMinutes(15).ToUnixTimeMilliseconds());
+        }
+
+        protected override async Task OnInitializedAsync()
+        {
+            await LoadData();
+        }
+
+        private async Task LoadData()
+        {
+            while(ChartRef == null)
+            {
+                Console.WriteLine($"{DateTime.Now}: Waiting for ChartRef to be assigned...");
+                await Task.Delay(100);
+            }
+            Data = Archipelago.Checks.SkipLast(1).ToList();
+            StateHasChanged();
+            await ChartRef.UpdateSeriesAsync(true);
+        }
+
         public MarkupString ShowTooltip(Check check)
         {
-            return (MarkupString)$"<b>{check.SenderName}</b> found <b>{check.ItemName}</b> for <b>{check.ReceiverName}</b><br/>{$"(Found at {check.LocationName})"}\n<br/>{check.Timestamp.ToShortDateString()} {check.Timestamp.ToShortTimeString()}";
+            var tooltipElement = $"<b>{check.SenderName}</b> found <b>{check.ItemName}</b> for <b>{check.ReceiverName}</b><br/>{$"(Found at {check.LocationName})"}\n<br/>{check.Timestamp.ToShortDateString()} {check.Timestamp.ToShortTimeString()}";
+            if (check.Receiver != null && check.Receiver.Game.Items.ContainsKey(check.ItemName) && !string.IsNullOrEmpty(check.Receiver.Game.Items[check.ItemName].Img))
+                return (MarkupString)($"<div style='display: flex; gap: 8px;'><img src='{check.Receiver.Game.Items[check.ItemName].ImageEndpoint}' width='64' height='64' /><div>" + tooltipElement + "</div>");
+            return (MarkupString)tooltipElement;
+        }
+
+        public void Dispose()
+        {
+            SearchService.OnDataChanged -= OnSearch;
         }
     }
 }

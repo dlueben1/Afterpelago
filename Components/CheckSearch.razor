@@ -1,0 +1,60 @@
+﻿@inject Afterpelago.Services.SearchService SearchService
+<MudPaper Style="height: 100%; padding: 8px;">
+    <MudStack Row>
+        <MudTextField @bind-Value="SearchValue" Label="Search by Item" Variant="Variant.Outlined" OnKeyUp="OnKey" />
+        <MudIconButton 
+            Disabled="@(SearchValue.Length < 4)" 
+            Icon="@Icons.Material.Filled.Search" 
+            Color="MudBlazor.Color.Primary" 
+            Size="MudBlazor.Size.Medium"
+            OnClick="Search" 
+            />
+    </MudStack>
+    <MudList T="string" Style="overflow-y: scroll; height:400px;">
+        @foreach (var check in Results)
+        {
+            <MudListItem 
+                Text="@check.ItemName" 
+                SecondaryText="@($"Found By {check.SenderName} ({check.Timestamp.ToString()})")" 
+                OnClick="@(() => TriggerZoomOnCheck(check))" 
+                >
+                <AvatarContent>
+                    @if (check.Receiver != null && check.Receiver.Game.Items.ContainsKey(check.ItemName) && !string.IsNullOrEmpty(check.Receiver.Game.Items[check.ItemName].Img))
+                    {
+                        <img src="@check.Receiver.Game.Items[check.ItemName].ImageEndpoint" width="48" height="48" />
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" />
+                    }
+                </AvatarContent>
+            </MudListItem>
+        }
+    </MudList>
+</MudPaper>
+
+@code {
+    public string SearchValue { get; set; } = string.Empty;
+
+    private List<Check> Results { get; set; } = new();
+
+    private void Search()
+    {
+        Results.Clear();
+        Results.AddRange(Archipelago.Checks
+            .Where(c => c.ItemName.Contains(SearchValue)));
+    }
+
+    private void OnKey(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter" && SearchValue.Length >= 4)
+        {
+            Search();
+        }
+    }
+
+    private void TriggerZoomOnCheck(Check check)
+    {
+        SearchService.SearchItem = check;
+    }
+}

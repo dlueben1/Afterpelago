@@ -1,11 +1,9 @@
 ﻿@using BlazorWorker.BackgroundServiceFactory
 @using BlazorWorker.Core
 @inject IWorkerFactory workerFactory
+@inject Afterpelago.Services.SearchService SearchService
+@implements IDisposable
 
-@if(!HasLoaded)
-{
-    <MudProgressCircular Size="MudBlazor.Size.Large" Indeterminate="true" Style="position: absolute; left: 50%; top: 50%; transform: translate(-50% -50%);" />
-}
 <ApexChart TItem="Check"
            Title="Checks Over Time"
            Options="ChartOptions"

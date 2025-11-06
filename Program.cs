@@ -1,3 +1,4 @@
+using Afterpelago.Services;
 using ApexCharts;
 using BlazorWorker.Core;
 using Microsoft.AspNetCore.Components.Web;
@@ -23,6 +24,8 @@ namespace Afterpelago
             builder.Services.AddWorkerFactory();
 
             builder.Services.AddApexCharts();
+
+            builder.Services.AddSingleton<SearchService>();
 
             await builder.Build().RunAsync();
         }
