@@ -14,7 +14,7 @@
         @foreach (var check in Results)
         {
             <MudListItem 
-                Text="@check.ItemName" 
+                Text="@($"{check.ReceiverName}'s {check.ItemName}")" 
                 SecondaryText="@($"Found By {check.SenderName} ({check.Timestamp.ToString()})")" 
                 OnClick="@(() => TriggerZoomOnCheck(check))" 
                 >
