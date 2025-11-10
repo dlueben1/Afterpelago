@@ -66,6 +66,7 @@ namespace Afterpelago.Models
             var itemsPath = Path.Combine(blobPath, "items.json");
             using(var httpClient = new HttpClient())
             {
+                Console.WriteLine($"Downloading from {itemsPath}");
                 var _items = await httpClient.GetFromJsonAsync<Item[]>(itemsPath) ?? [];
                 for(int i = 0; i < _items.Length; i++)
                 {

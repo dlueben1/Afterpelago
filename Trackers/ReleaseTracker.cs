@@ -18,7 +18,7 @@ namespace Afterpelago.Trackers
         public void Save()
         {
             // Store all releases
-            Archipelago.Releases = Releases.ToArray();
+            Archipelago.Releases = Releases.DistinctBy(x => x.SlotName).ToArray();
 
             // Update all Players with their release statistics
             for (int i = 0; i < Releases.Count; i++)

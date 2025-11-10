@@ -46,5 +46,13 @@
   {
     "name": "A Hat in Time",
     "IsPtSupported": true
+  },
+  {
+    "name": "Balatro",
+    "IsPtSupported": true
+  },
+  {
+    "name": "Celeste (Open World)",
+    "IsPtSupported": true
   }
 ]
