@@ -42,7 +42,7 @@
     {
         Results.Clear();
         Results.AddRange(Archipelago.Checks
-            .Where(c => c.ItemName.Contains(SearchValue)));
+            .Where(c => c.ItemName.ToLower().Contains(SearchValue.ToLower())));
     }
 
     private void OnKey(KeyboardEventArgs args)

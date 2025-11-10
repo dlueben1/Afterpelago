@@ -54,5 +54,9 @@
   {
     "name": "Celeste (Open World)",
     "IsPtSupported": true
+  },
+  {
+    "name": "Sonic Adventure DX",
+    "IsPtSupported": true
   }
 ]
