@@ -24,7 +24,7 @@
     "IsPtSupported": true
   },
   {
-    "name": "The Legend of Zelda: The Wind Waker",
+    "name": "The Wind Waker",
     "IsPtSupported": true
   },
   {
@@ -44,6 +44,10 @@
     "IsPtSupported": true
   },
   {
+    "name": "Pokemon Black and White",
+    "IsPtSupported": true
+  },
+  {
     "name": "A Hat in Time",
     "IsPtSupported": true
   },
@@ -57,6 +61,10 @@
   },
   {
     "name": "Sonic Adventure DX",
+    "IsPtSupported": true
+  },
+  {
+    "name": "Pseudoregalia",
     "IsPtSupported": true
   }
 ]
