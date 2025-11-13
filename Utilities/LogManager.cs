@@ -189,7 +189,6 @@ namespace Afterpelago.Utilities
                                     var details = entry as CheckObtainedLogEntry;
                                     if (details == null) break;
 
-
                                     // Keep track of the order in which these checks were obtained
                                     details.ObtainedOrder = checks.Count + 1;
 
