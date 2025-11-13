@@ -21,9 +21,10 @@ namespace Afterpelago.Trackers
             Archipelago.Releases = Releases.DistinctBy(x => x.SlotName).ToArray();
 
             // Update all Players with their release statistics
-            for (int i = 0; i < Releases.Count; i++)
+            for (int i = 0; i < Archipelago.Releases.Length; i++)
             {
-                var release = Releases[i];
+                var release = Archipelago.Releases[i];
+                Console.WriteLine($"RELEASE SLOT: {release.SlotName}");
                 if (release.Slot != null) release.Slot.FinishOrder = i + 1;
 
                 // Medal: First Finish
