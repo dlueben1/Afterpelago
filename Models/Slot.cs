@@ -5,6 +5,8 @@ namespace Afterpelago.Models
     [DataContract]
     public class Slot
     {
+        #region Slot Attributes
+
         /// <summary>
         /// The name of the Player/Slot
         /// </summary>
@@ -17,6 +19,77 @@ namespace Afterpelago.Models
         [DataMember]
         public Game Game { get; private set; }
 
+        #endregion
+
+        #region Check-Related Statistics
+
+        /// <summary>
+        /// The total number of checks from this Slot's world
+        /// </summary>
+        public int TotalChecks { get; set; } = 0;
+
+        /// <summary>
+        /// A collection to hold the count of checks found by their method
+        /// (Collected by the Player, Released on Clear, Released by another Player's Clear)
+        /// </summary>
+        public List<BasicStat> MethodOfChecksFound { get; private set; }
+
+        /// <summary>
+        /// The number of your items that were supposed to be found in other player's worlds, but
+        /// you obtained by clearing your goal.
+        /// </summary>
+        public int OtherPeoplesChecksFoundByMyRelease { get; set; }
+
+        /// <summary>
+        /// The number of Checks-Per-Hour obtained by this slot.
+        /// Excludes checks found by yours or other peoples' releases
+        /// </summary>
+        public double ChecksPerHour { get; set; } = 0;
+
+        /// <summary>
+        /// The number of Checks found normally, without releases.
+        /// </summary>
+        public decimal NumberOfChecksFoundNormally
+        {
+            get
+            {
+                return MethodOfChecksFound.First(x => x.Label == "Found Normally").Value;
+            }
+        }
+
+        /// <summary>
+        /// The number of Checks found by this slot's release (clearing the game)
+        /// </summary>
+        public decimal NumberOfChecksFoundByMyRelease
+        {
+            get
+            {
+                return MethodOfChecksFound.First(x => x.Label == "Found by Clearing").Value;
+            }
+        }
+
+        public decimal NumberOfChecksFoundByOtherReleases
+        {
+            get
+            {
+                return MethodOfChecksFound.First(x => x.Label == "Did Not Find Themselves").Value;
+            }
+        }
+
+        /// <summary>
+        /// The Percentage of Checks found normally before clearing the game.
+        /// Excludes checks found by yours or other peoples' releases
+        /// </summary>
+        public float PercentageOfChecksBeforeRelease
+        {
+            get
+            {
+                return ((float)NumberOfChecksFoundNormally / TotalChecks) * 100f;
+            }
+        }
+
+        #endregion
+
         [DataMember]
         public int? FinishOrder { get; set; } = null;
 
@@ -28,29 +101,14 @@ namespace Afterpelago.Models
 
         public TimeSpan ActiveTimeOnline { get; set; } = TimeSpan.Zero;
 
-        public double ChecksPerHour { get; set; } = 0;
-
-        public float PercentageOfChecksBeforeRelease
-        {
-            get
-            {
-                int numberOfChecksBeforeRelease = TotalChecksFound  - EstimatedChecksFromRelease;
-                return ((float)numberOfChecksBeforeRelease / (float)TotalChecksFound) * 100f;
-            }
-        }
-
-        public int TotalChecksFound { get; set; } = 0;
-
-        /// <summary>
-        /// @todo Eventually this may want to exist as a .Count or .Length of a collection of checks
-        /// </summary>
-        public int EstimatedChecksFromRelease { get; set; } = 0;
-
         public Slot(string name, Game game)
         {
             PlayerName = name;
             Game = game;
-            Medals = new List<Medal>();
+
+            // Initialize collections
+            Medals = new();
+            MethodOfChecksFound = new();
         }
     }
         

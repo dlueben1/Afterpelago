@@ -23,9 +23,40 @@ namespace Afterpelago.Trackers
             // Update all Players with their release statistics
             for (int i = 0; i < Archipelago.Releases.Length; i++)
             {
+                // Get the release data
                 var release = Archipelago.Releases[i];
-                Console.WriteLine($"RELEASE SLOT: {release.SlotName}");
-                if (release.Slot != null) release.Slot.FinishOrder = i + 1;
+
+                // Ignore release if somehow the slot is null
+                if (release.Slot == null) continue;
+                
+                // Mark the finish order for this Slot
+                release.Slot.FinishOrder = i + 1;
+
+                // Get the range of time that will count as release (eventually it'd be better to walk the distance between checks maybe)
+                var releaseTimeStart = release.Timestamp.AddSeconds(-5);
+                var releaseTimeEnd = release.Timestamp.AddSeconds(5);
+
+                // Mark all related checks from this release
+                var releasedChecks = Archipelago.Checks.Where(c => 
+                    (c.SenderName == release.SlotName || c.ReceiverName == release.SlotName) && 
+                    c.Timestamp >= releaseTimeStart && 
+                    c.Timestamp <= releaseTimeEnd
+                ).ToArray();
+                for(int c = 0; c < releasedChecks.Length; c++)
+                {
+                    var check = releasedChecks[c];
+                    check.Trigger = CheckTrigger.Release;
+                    check.TriggerSlotName = release.SlotName;
+                }
+
+                // Mark the ones from this player's world
+                var fromReleasedChecks = releasedChecks.Where(c => c.SenderName == release.SlotName).ToArray();
+
+                // Stats: Track the number of our items from other people's worlds that were found by releasing
+                release.Slot.OtherPeoplesChecksFoundByMyRelease = releasedChecks.Length - fromReleasedChecks.Length;
+
+                // Stats: Add Number of Checks found by this slot's release
+                release.Slot.MethodOfChecksFound.Add(new BasicStat("Found by Clearing", fromReleasedChecks.Length));
 
                 // Medal: First Finish
                 if (i == 0 && release.Slot != null)
@@ -44,6 +75,21 @@ namespace Afterpelago.Trackers
                 {
                     release.Slot.Medals.Add(new Medal("Third Place", "Was the Third Player to Release their Items", MudBlazor.Icons.Material.Filled.Flag));
                 }
+            }
+
+            // Once all Releases and their Checks have been processed, find how many checks were found by others
+            foreach(var pair in Archipelago.Slots)
+            {
+                // Grab the Slot
+                var slot = pair.Value;
+
+                // Stats: Add Number of Checks found by other people's clears
+                var checksFoundByOthers = Archipelago.Checks.Where(c => 
+                    c.SenderName == slot.PlayerName && 
+                    c.Trigger == CheckTrigger.Release && 
+                    c.TriggerSlotName != slot.PlayerName
+                ).ToArray();
+                slot.MethodOfChecksFound.Add(new BasicStat("Did Not Find Themselves", checksFoundByOthers.Length));
             }
         }
     }

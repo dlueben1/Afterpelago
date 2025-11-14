@@ -1,59 +1,85 @@
 ﻿@page "/report/players"
 @using Afterpelago.Utilities
+@using Afterpelago.Models
 
 <article style="display: flex; flex-direction: row; padding: 4em; overflow-y: auto; max-height: 90vh;" Class="mt-16">
-    <MudStack Style="width: 100%;">
-        <MudExpansionPanels MultiExpansion="true">
-            @foreach (var player in Archipelago.Slots)
-            {
-                <MudExpansionPanel Text="@player.Value.PlayerName">
-                    <MudText Typo="Typo.subtitle1">Game: @player.Value.Game.FriendlyName</MudText>
-                    <MudGrid>
-                        <MudItem xs="12" sm="6">
-                            <MudList T="string">
-                                <MudListSubheader>
-                                    Player Info
-                                </MudListSubheader>
-                                <MudListItem Text="Total Active Time" SecondaryText="@(player.Value.ActiveTimeOnline.ToReadableString())" />
-                                <MudDivider />
-                                <MudListSubheader>
-                                    Checks
-                                </MudListSubheader>
-                                <MudListItem Text="Average Checks Per Hour" SecondaryText="@player.Value.ChecksPerHour.ToString("F2")" />
-                                <MudListItem Text="Percentage of Checks Found before Release" SecondaryText="@($"{player.Value.PercentageOfChecksBeforeRelease.ToString("F2")}%")" />
-                                <MudListItem Text="# of Leftover Checks on Release" SecondaryText="@player.Value.EstimatedChecksFromRelease.ToString()" />
-                                <MudListItem Text="First Item Received" SecondaryText="@($"{player.Value.FirstItemReceived?.Name} from {player.Value.FirstItemLogEntry.SenderName}")">
-                                    <AvatarContent>
-                                        @if(!string.IsNullOrEmpty(player.Value.FirstItemReceived.Img))
-                                        {
-                                            <img src="@player.Value.FirstItemReceived.ImageEndpoint" width="48" height="48" />
-                                        }
-                                        else
-                                        {
-                                            <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" />
-                                        }
-                                    </AvatarContent>
-                                </MudListItem>
-                            </MudList>
-                        </MudItem>
-                        <MudItem xs="12" sm="6">
-                            <MudList T="string">
-                                <MudListSubheader>
-                                    Medals
-                                </MudListSubheader>
-                                @foreach (var medal in player.Value.Medals)
+    <MudGrid>
+        <!-- Player Name -->
+        <MudItem xs="12" sm="6" md="9">
+            <MudText Typo="Typo.h3">@CurrentPlayer.PlayerName</MudText>
+        </MudItem>
+
+        <!-- Player Selection -->
+        <MudItem xs="12" sm="6" md="3">
+            <MudSelect T="Slot" Label="Select Player" Variant="Variant.Filled" ValueChanged="OnPlayerChanged">
+                @foreach (var player in Archipelago.Slots.Values)
+                {
+                    <MudSelectItem T="Slot" Value="@player" Style="max-width: 300px;">@player.PlayerName</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+
+        <!-- Checks Breakdown (Chart, Data) -->
+        <MudItem xs="12" sm="6">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Checks Breakdown</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <ApexChart 
+                        @ref="checkChart"
+                        TItem="BasicStat"
+                        Options="checkPercentOptions"
+                        Height="300">
+                        <ApexPointSeries TItem="BasicStat"
+                                         Items="@CurrentPlayer.MethodOfChecksFound"
+                                         SeriesType="SeriesType.Donut"
+                                         XValue="@(e => e.Label)"
+                                         YValue="@(e => e.Value)" />
+                    </ApexChart>
+                    <MudList T="string">
+                        <MudListItem Text="Average Checks Per Hour" SecondaryText="@CurrentPlayer.ChecksPerHour.ToString("F2")" />
+                        <MudListItem Text="Percentage of Checks Found Normally before Release" SecondaryText="@($"{CurrentPlayer.PercentageOfChecksBeforeRelease.ToString("F2")}%")" />
+                        <MudListItem Text="# of Leftover Checks on Release" SecondaryText="@CurrentPlayer.NumberOfChecksFoundByMyRelease.ToString()" />
+                        <MudListItem Text="First Item Received" SecondaryText="@($"{CurrentPlayer.FirstItemReceived?.Name} from {CurrentPlayer.FirstItemLogEntry.SenderName}")">
+                            <AvatarContent>
+                                @if (!string.IsNullOrEmpty(CurrentPlayer.FirstItemReceived.Img))
                                 {
-                                    <MudListItem Text="@medal.Name" SecondaryText="@medal.Description" Icon="@medal.Icon" />
+                                    <img src="@CurrentPlayer.FirstItemReceived.ImageEndpoint" width="48" height="48" />
                                 }
-                                @if(player.Value.Medals.Count == 0)
+                                else
                                 {
-                                    <MudListItem Text="No Medals Earned" />
+                                    <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" />
                                 }
-                            </MudList>
-                        </MudItem>
-                    </MudGrid>
-                </MudExpansionPanel>
-            }
-        </MudExpansionPanels>
-    </MudStack>
+                            </AvatarContent>
+                        </MudListItem>
+                    </MudList>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Earned Medals</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudList T="string">
+                        @foreach (var medal in CurrentPlayer.Medals)
+                        {
+                            <MudListItem Text="@medal.Name" SecondaryText="@medal.Description" Icon="@medal.Icon" />
+                        }
+                        @if (CurrentPlayer.Medals.Count == 0)
+                        {
+                            <MudListItem Text="No Medals Earned" />
+                        }
+                    </MudList>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
 </article>

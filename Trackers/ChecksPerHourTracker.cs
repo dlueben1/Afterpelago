@@ -24,13 +24,13 @@ namespace Afterpelago.Trackers
             if (check == null) return;
 
             // Increment the number of checks found
-            if (!checksPerPlayer.ContainsKey(check.SenderName))
+            if (checksPerPlayer.ContainsKey(check.SenderName))
             {
-                checksPerPlayer[check.SenderName] = 1;
+                checksPerPlayer[check.SenderName]++;
             }
             else
             {
-                checksPerPlayer[check.SenderName]++;
+                checksPerPlayer[check.SenderName] = 1;
             }
         }
 
@@ -98,44 +98,10 @@ namespace Afterpelago.Trackers
 
         public void Save()
         {
-            // Generate a reverse version of the log
-            var reversedChecks = Archipelago.Checks.Reverse<Check>();
-
-            // Slide all release times back by 30 seconds to ensure that checks sent before the clear message aren't counted either
-            var releaseCutoffByPlayer = Archipelago.Releases.ToDictionary(
-                release => release.SlotName,
-                release => release.Timestamp.AddSeconds(-10)
-            );
-
             // Set each player's original total checks
             foreach(var pair in checksPerPlayer)
             {
-                Archipelago.Slots[pair.Key].TotalChecksFound = pair.Value;
-            }
-
-            // Walk through the log backwards so that we can ignore any checks sent after or close to clearing
-            foreach (var check in reversedChecks)
-            {
-                // Stop loop early if we can
-                if (releaseCutoffByPlayer.Count == 0) break;
-
-                // If the current player is still being tracked, see if this check should be ignored
-                if (releaseCutoffByPlayer.ContainsKey(check.SenderName))
-                {
-                    // If this check was sent after the cutoff time, ignore it
-                    if(check.Timestamp >= releaseCutoffByPlayer[check.SenderName])
-                    {
-                        // Decrement the number of checks found
-                        if (checksPerPlayer.ContainsKey(check.SenderName))
-                        {
-                            checksPerPlayer[check.SenderName]--;
-                        }
-                    }
-                    else
-                    {
-                        releaseCutoffByPlayer.Remove(check.SenderName);
-                    }
-                }
+                Archipelago.Slots[pair.Key].TotalChecks = pair.Value;
             }
 
             // Keep track of players worth medals
@@ -147,42 +113,51 @@ namespace Afterpelago.Trackers
             // Calculate Checks Per Hour & Time Online for each player
             foreach (var kvp in checksPerPlayer)
             {
+                // Grab the player info
                 var playerName = kvp.Key;
-                var checksFound = kvp.Value;
+                if (!Archipelago.Slots.ContainsKey(playerName)) continue;
+                var player = Archipelago.Slots[playerName];
+
+                // Calculate the total number of checks found, MINUS the ones found from releases (this works because it runs after ReleaseTracker)
+                int checksFoundFromOtherSources = (int)player.MethodOfChecksFound.Sum(x => x.Value);
+                var totalChecksFound = kvp.Value;
+                int checksFoundNormally = totalChecksFound - checksFoundFromOtherSources;
+
+                // Stat: Store Total Checks and Checks found from other Sources
+                player.MethodOfChecksFound.Add(new BasicStat("Found Normally", checksFoundNormally));
+                player.TotalChecks = totalChecksFound;
+
+                // Calculate the Checks Per Hour
                 long millisecondsActive = millisecondsActivePerPlayer.ContainsKey(playerName) ? millisecondsActivePerPlayer[playerName] : 0;
                 double hoursActive = millisecondsActive / (double)_hoursToMilliseconds;
-                double checksPerHour = hoursActive > 0 ? (checksFound / hoursActive) : 0;
-                
+                double checksPerHour = hoursActive > 0 ? (checksFoundNormally / hoursActive) : 0;
+
                 // Set the player's Checks Per Hour and Active Time, then check for medal potential
-                if (Archipelago.Slots.ContainsKey(playerName))
+                player.ChecksPerHour = checksPerHour;
+                player.ActiveTimeOnline = TimeSpan.FromMilliseconds(millisecondsActive);
+
+                // See if this player is eligible for any post-iteration medals
+                if (mostPerHour == null || checksPerHour > mostPerHour?.ChecksPerHour) mostPerHour = player;
+                if (leastPerHour == null || checksPerHour < leastPerHour?.ChecksPerHour) leastPerHour = player;
+                if (mostOnline == null || mostOnline?.ActiveTimeOnline < player.ActiveTimeOnline) mostOnline = player;
+                if (leastOnline == null || leastOnline?.ActiveTimeOnline > player.ActiveTimeOnline) leastOnline = player;
+
+                // Medal: Efficient
+                if (checksPerHour > 30.0)
                 {
-                    var player = Archipelago.Slots[playerName];
-                    player.ChecksPerHour = checksPerHour;
-                    player.ActiveTimeOnline = TimeSpan.FromMilliseconds(millisecondsActive);
-                    player.EstimatedChecksFromRelease = player.TotalChecksFound - checksFound;
+                    player.Medals.Add(new Medal("Efficient", "Maintained an Average of over 30 Checks per Hour", MudBlazor.Icons.Material.Filled.Speed));
+                }
 
-                    if(mostPerHour == null || checksPerHour > mostPerHour?.ChecksPerHour) mostPerHour = player;
-                    if(leastPerHour == null || checksPerHour < leastPerHour?.ChecksPerHour) leastPerHour = player;
-                    if(mostOnline == null || mostOnline?.ActiveTimeOnline < player.ActiveTimeOnline) mostOnline = player;
-                    if(leastOnline == null || leastOnline?.ActiveTimeOnline > player.ActiveTimeOnline) leastOnline = player;
+                // Medal: Thorough
+                if (player.PercentageOfChecksBeforeRelease > 80.0f)
+                {
+                    player.Medals.Add(new Medal("Thorough Explorer", "Found over 80% of Checks before Releasing", MudBlazor.Icons.Material.Filled.TravelExplore));
+                }
 
-                    // Medal: Efficient
-                    if(checksPerHour > 30.0)
-                    {
-                        player.Medals.Add(new Medal("Efficient", "Maintained an Average of over 30 Checks per Hour", MudBlazor.Icons.Material.Filled.Speed));
-                    }
-
-                    // Medal: Thorough
-                    if(player.PercentageOfChecksBeforeRelease > 80.0f)
-                    {
-                        player.Medals.Add(new Medal("Thorough Explorer", "Found over 80% of Checks before Releasing", MudBlazor.Icons.Material.Filled.TravelExplore));
-                    }
-
-                    // Medal: Low Percent of Checks Before Release
-                    if(player.PercentageOfChecksBeforeRelease < 50.0f)
-                    {
-                        player.Medals.Add(new Medal("The Straightest Path is a Line", "Found less than 50% of Checks before Releasing", MudBlazor.Icons.Material.Filled.SportsScore));
-                    }
+                // Medal: Low Percent of Checks Before Release
+                if (player.PercentageOfChecksBeforeRelease < 50.0f)
+                {
+                    player.Medals.Add(new Medal("The Straightest Path is a Line", "Found less than 50% of Checks before Releasing", MudBlazor.Icons.Material.Filled.SportsScore));
                 }
             }
 
