@@ -14,6 +14,13 @@ namespace Afterpelago.Models
         ServerShutdown
     }
 
+    public enum CheckTrigger: byte
+    {
+        Normal = 0,
+        Cheat,
+        Release
+    }
+
     /// <summary>
     /// Represents an entry (line) in a Log File.
     /// 
@@ -145,6 +152,10 @@ namespace Afterpelago.Models
         public required string ItemName { get; set; }
         [DataMember]
         public required string LocationName { get; set; }
+        [DataMember]
+        public CheckTrigger Trigger { get; set; }
+        [DataMember]
+        public string? TriggerSlotName { get; set; }
 
         [DataMember]
         public int ObtainedOrder { get; set; }
