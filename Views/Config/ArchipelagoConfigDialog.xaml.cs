@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using AfterpelagoWPF.Connectors;
 using AfterpelagoWPF.Services;
+using MahApps.Metro.Controls;
 using Microsoft.Win32;
 
 namespace AfterpelagoWPF.Views
@@ -10,7 +11,7 @@ namespace AfterpelagoWPF.Views
     /// <summary>
     /// Lets a user specify their local Archipelago Installation
     /// </summary>
-    public partial class ArchipelagoConfigDialog : Window, INotifyPropertyChanged
+    public partial class ArchipelagoConfigDialog : MetroWindow, INotifyPropertyChanged
     {
         private string? _currentPath;
         private bool _isValidArchipelagoDirectory;

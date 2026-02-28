@@ -1,17 +1,49 @@
 ﻿using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using AfterpelagoWPF.Views;
+using MahApps.Metro.Controls;
 
 namespace AfterpelagoWPF
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : MetroWindow
     {
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void OnFileMenuClick(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.ContextMenu is { } menu)
+            {
+                menu.PlacementTarget = btn;
+                menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+                menu.IsOpen = true;
+            }
+        }
+
+        private void OnToolsMenuClick(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.ContextMenu is { } menu)
+            {
+                menu.PlacementTarget = btn;
+                menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+                menu.IsOpen = true;
+            }
+        }
+
+        private void OnDebugMenuClick(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.ContextMenu is { } menu)
+            {
+                menu.PlacementTarget = btn;
+                menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+                menu.IsOpen = true;
+            }
         }
 
         private void OnConfigureArchipelago(object sender, RoutedEventArgs e)
