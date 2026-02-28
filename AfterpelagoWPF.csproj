@@ -9,10 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Connectors\" />
     <Folder Include="Core\Analysis\" />
     <Folder Include="Models\Archipelago\" />
-    <Folder Include="Views\" />
   </ItemGroup>
 
 </Project>

@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:AfterpelagoWPF"
         mc:Ignorable="d"
         WindowState="Maximized"
-        Title="Afterpelago" Height="450" Width="800">
+        Title="Afterpelago" 
+        Height="450" 
+        Width="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -21,6 +23,13 @@
                     <MenuItem Header="From Files" />
                     <MenuItem Header="From Web" />
                 </MenuItem>
+                <MenuItem Header="Configure Local Application Data">
+                    <MenuItem Header="Archipelago" Click="OnConfigureArchipelago" />
+                    <MenuItem Header="PopTracker" Click="OnConfigurePopTracker" />
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="Debug">
+                <MenuItem Header="Browse Local Application Data" Click="OnBrowseLocalApplications" />
             </MenuItem>
         </Menu>
         

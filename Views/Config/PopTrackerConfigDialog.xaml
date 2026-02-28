@@ -1,0 +1,77 @@
+<Window x:Class="AfterpelagoWPF.Views.PopTrackerConfigDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Configure PopTracker"
+    Width="550"
+    Height="300"
+    WindowStartupLocation="CenterOwner"
+    ResizeMode="NoResize">
+<Window.Resources>
+    <SolidColorBrush x:Key="DetectedColor" Color="Green"/>
+    <SolidColorBrush x:Key="NotDetectedColor" Color="Red"/>
+    <System:String x:Key="DetectedText" xmlns:System="clr-namespace:System;assembly=mscorlib">✔ PopTracker Detected</System:String>
+    <System:String x:Key="NotDetectedText" xmlns:System="clr-namespace:System;assembly=mscorlib">✘ PopTracker Not Detected</System:String>
+</Window.Resources>
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Detection status -->
+        <TextBlock x:Name="StatusText"
+                   Grid.Row="0"
+                   FontSize="18"
+                   FontWeight="SemiBold"
+                   Margin="0,0,0,8">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Text" Value="{StaticResource NotDetectedText}"/>
+                    <Setter Property="Foreground" Value="{StaticResource NotDetectedColor}"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsValidPopTrackerDirectory}" Value="True">
+                            <Setter Property="Text" Value="{StaticResource DetectedText}"/>
+                            <Setter Property="Foreground" Value="{StaticResource DetectedColor}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+        <!-- Detected path -->
+        <TextBox x:Name="PathTextBox"
+                 Grid.Row="1"
+                 IsReadOnly="True"
+                 Margin="0,0,0,12"
+                 Padding="4"
+                 FontSize="13"
+                 Background="#F0F0F0"
+                 Text="{Binding CurrentPath, Mode=OneWay}"/>
+
+        <!-- Description -->
+        <TextBlock Grid.Row="2"
+                   TextWrapping="Wrap"
+                   Margin="0,0,0,16"
+                   FontSize="13">
+            This is the path to your local PopTracker installation. By connecting this to Afterpelago, your PopTracker packs can be automatically detected and imported.
+        </TextBlock>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="4"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <Button x:Name="SavePathButton"
+                    Content="Use this PopTracker Directory"
+                    Padding="12,6"
+                    Margin="0,0,8,0"
+                    Click="SavePathButton_Click"/>
+            <Button x:Name="ManualChooseButton"
+                    Content="Manually Choose PopTracker Directory"
+                    Padding="12,6"
+                    Click="ManualChooseButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
