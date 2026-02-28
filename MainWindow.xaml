@@ -1,0 +1,34 @@
+﻿<Window x:Class="AfterpelagoWPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AfterpelagoWPF"
+        mc:Ignorable="d"
+        WindowState="Maximized"
+        Title="Afterpelago" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- App Bar -->
+        <Menu Grid.Row="0">
+            <MenuItem Header="File" />
+            <MenuItem Header="Tools">
+                <MenuItem Header="Import Game Data">
+                    <MenuItem Header="From Files" />
+                    <MenuItem Header="From Web" />
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        
+        <!-- Landing Page -->
+        <StackPanel Grid.Row="1" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Button Content="Create Post-Game Report" Margin="12" Height="32" />
+            <Button Content="View Post-Game Report" Margin="12" Height="32" />
+            <Button Content="Configure Afterpelago" Margin="12" Height="32" />
+        </StackPanel>
+    </Grid>
+</Window>
