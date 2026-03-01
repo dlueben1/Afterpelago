@@ -11,45 +11,47 @@
         TitleCharacterCasing="Normal"
         WindowState="Maximized"
         WindowTitleBrush="Transparent"
-        Height="450" 
-        Width="800">
+        WindowButtonCommandsOverlayBehavior="Never"
+        Height="720" 
+        Width="1280">
+
+    <mah:MetroWindow.Resources>
+        <SolidColorBrush x:Key="MahApps.Brushes.IdealForeground" Color="Black" />
+        <Style x:Key="LargeTileStyle" TargetType="mah:Tile">
+            <Setter Property="Height" Value="125" />
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+            <Setter Property="TextOptions.TextRenderingMode" Value="ClearType" />
+            <Setter Property="TitleFontSize" Value="14" />
+            <Setter Property="Width" Value="300" />
+        </Style>
+        <Style x:Key="SmallTileStyle" TargetType="mah:Tile">
+            <Setter Property="Height" Value="125" />
+            <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
+            <Setter Property="TextOptions.TextRenderingMode" Value="ClearType" />
+            <Setter Property="TitleFontSize" Value="14" />
+            <Setter Property="Width" Value="147" />
+        </Style>
+    </mah:MetroWindow.Resources>
     
     <!-- Gradient BG -->
     <Window.Background>
-        <DrawingBrush Stretch="Fill">
-            <DrawingBrush.Drawing>
-                <DrawingGroup>
-
-                    <!-- 1) Base: dark diagonal wash (top-left -> bottom-right) -->
-                    <GeometryDrawing Geometry="M0,0 L1,0 1,1 0,1 Z">
-                        <GeometryDrawing.Brush>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#FF186A90" Offset="0.00"/>
-                                <GradientStop Color="#0A2838" Offset="0.75"/>
-                                <GradientStop Color="#051016" Offset="1.00"/>
-                            </LinearGradientBrush>
-                        </GeometryDrawing.Brush>
-                    </GeometryDrawing>
-
-                    <!-- 2) Overlay: upper-left "emphasis" spotlight -->
-                    <GeometryDrawing Geometry="M0,0 L1,0 1,1 0,1 Z">
-                        <GeometryDrawing.Brush>
-                            <RadialGradientBrush
-                            Center="0.14,0.10"
-                            GradientOrigin="0.14,0.10"
-                            RadiusX="1.75" RadiusY="1.75">
-                                <!-- teal highlight near the corner, fading out -->
-                                <GradientStop Color="#E6176F98" Offset="0.00"/>
-                                <GradientStop Color="#80176F98" Offset="0.25"/>
-                                <GradientStop Color="#00176F98" Offset="0.60"/>
-                            </RadialGradientBrush>
-                        </GeometryDrawing.Brush>
-                    </GeometryDrawing>
-                </DrawingGroup>
-            </DrawingBrush.Drawing>
-        </DrawingBrush>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <!-- Top-left: soft lavender -->
+            <GradientStop Color="#E8C8DBF7" Offset="0.0" />
+            <!-- Upper-middle: pastel cyan -->
+            <GradientStop Color="#E8BDF3EA" Offset="0.2" />
+            <!-- Center-top: hint of mint green -->
+            <GradientStop Color="#E8C1F3C9" Offset="0.4" />
+            <!-- Center: warm white / lightest pink -->
+            <GradientStop Color="#E8F7D1E4" Offset="0.6" />
+            <!-- Lower: soft rose -->
+            <GradientStop Color="#E8FBCFDB" Offset="0.8" />
+            <!-- Bottom-right: faint peach/amber -->
+            <GradientStop Color="#E8F3DDC2" Offset="1.0" />
+        </LinearGradientBrush>
     </Window.Background>
 
+    <!-- Action Menu -->
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands>
             <Button Content="File" Click="OnFileMenuClick">
@@ -83,12 +85,72 @@
     </mah:MetroWindow.RightWindowCommands>
     
     <!-- Content Area -->
-    <Grid>
-        <!-- Landing Page -->
-        <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <Button Content="Create Post-Game Report" Margin="12" Height="32" Foreground="White" />
-            <Button Content="View Post-Game Report" Margin="12" Height="32" Foreground="White" />
-            <Button Content="Configure Afterpelago" Margin="12" Height="32" Foreground="White" />
-        </StackPanel>
+    <Grid Background="{DynamicResource MahApps.Brushes.Accent4}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="430*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="120" />
+            <RowDefinition Height="180" />
+            <RowDefinition Height="80" />
+            <RowDefinition Height="259*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Column="1"
+           VerticalAlignment="Center"
+           FontFamily="Segoe UI"
+           FontSize="30"
+           FontWeight="Light"
+           Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+           Text="Welcome to the Post-Game" />
+
+        <WrapPanel Grid.Row="1"
+           Grid.Column="1"
+           HorizontalAlignment="Left"
+           VerticalAlignment="Top">
+            <mah:Tile Title="New Report"
+                  Background="#FFCBE1"
+                  HorizontalTitleAlignment="Right"
+                  Margin="3"
+                  mah:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                  Style="{StaticResource LargeTileStyle}">
+                <iconPacks:PackIconBoxIcons Width="40" Height="40" Kind="SolidBookAdd" />
+            </mah:Tile>
+            <mah:Tile Title="Open Report"
+                  HorizontalTitleAlignment="Right"
+                  Background="#F9E1A8"
+  Margin="3"
+  mah:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+  Style="{StaticResource LargeTileStyle}">
+                <iconPacks:PackIconGameIcons Width="40" Height="40" Kind="OpenBook" />
+            </mah:Tile>
+            <mah:Tile Title="Configure"
+                  Margin="3"
+                  mah:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+  Background="#D6E5BD"
+  HorizontalTitleAlignment="Right"
+  Style="{StaticResource SmallTileStyle}">
+                <iconPacks:PackIconBoxIcons Width="40"
+                      Height="40"
+                      Kind="RegularGear" />
+            </mah:Tile>
+            <mah:Tile Title="Share Report"
+                  Background="#BCDBEC"
+                  mah:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                  HorizontalTitleAlignment="Right"
+              Style="{StaticResource LargeTileStyle}">
+                <iconPacks:PackIconBoxIcons Width="40" Height="40" Kind="RegularShare" />
+            </mah:Tile>
+        </WrapPanel>
+
+        <TextBlock Grid.Column="1"
+                   Grid.Row="2"
+                   VerticalAlignment="Center"
+                   FontFamily="Segoe UI"
+                   FontSize="30"
+                   FontWeight="Light"
+                   Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                   Text="Recent Reports" />
     </Grid>
 </mah:MetroWindow>

@@ -10,8 +10,11 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <!-- Theme setting -->
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Teal.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Indigo.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- Override title bar foreground color to Black for transparent title bar -->
+            <SolidColorBrush x:Key="MahApps.Brushes.WindowTitle" Color="Black" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>
