@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <Folder Include="Core\Analysis\" />
-    <Folder Include="Models\Archipelago\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,120 @@
+﻿<UserControl x:Class="AfterpelagoWPF.Views.Dashboard"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AfterpelagoWPF.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <Style x:Key="LargeTileStyle"
+               TargetType="mah:Tile">
+            <Setter Property="Height"
+                    Value="125" />
+            <Setter Property="TextOptions.TextFormattingMode"
+                    Value="Display" />
+            <Setter Property="TextOptions.TextRenderingMode"
+                    Value="ClearType" />
+            <Setter Property="TitleFontSize"
+                    Value="14" />
+            <Setter Property="Width"
+                    Value="300" />
+        </Style>
+        <Style x:Key="SmallTileStyle"
+               TargetType="mah:Tile">
+            <Setter Property="Height"
+                    Value="125" />
+            <Setter Property="TextOptions.TextFormattingMode"
+                    Value="Ideal" />
+            <Setter Property="TextOptions.TextRenderingMode"
+                    Value="ClearType" />
+            <Setter Property="TitleFontSize"
+                    Value="14" />
+            <Setter Property="Width"
+                    Value="147" />
+        </Style>
+    </UserControl.Resources>
+    
+    <!-- Content Area -->
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="430*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="120" />
+            <RowDefinition Height="180" />
+            <RowDefinition Height="80" />
+            <RowDefinition Height="259*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Column="1"
+                   VerticalAlignment="Center"
+                   FontFamily="Segoe UI"
+                   FontSize="30"
+                   FontWeight="Light"
+                   Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                   Text="Welcome to the Post-Game" />
+
+        <!-- Main Action Tiles -->
+        <WrapPanel Grid.Row="1"
+                   Grid.Column="1"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top">
+            <mah:Tile Title="New Report"
+                      Background="#FFCBE1"
+                      HorizontalTitleAlignment="Right"
+                      Margin="3"
+                      mah:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                      Style="{StaticResource LargeTileStyle}"
+                      Click="OnNewReportClick">
+                <iconPacks:PackIconBoxIcons Width="40"
+                                            Height="40"
+                                            Kind="SolidBookAdd" />
+            </mah:Tile>
+            <mah:Tile Title="Open Report"
+                      HorizontalTitleAlignment="Right"
+                      Background="#F9E1A8"
+                      Margin="3"
+                      mah:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                      Style="{StaticResource LargeTileStyle}">
+                <iconPacks:PackIconGameIcons Width="40"
+                                             Height="40"
+                                             Kind="OpenBook" />
+            </mah:Tile>
+            <mah:Tile Title="Configure"
+                      Margin="3"
+                      mah:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                      Background="#D6E5BD"
+                      HorizontalTitleAlignment="Right"
+                      Style="{StaticResource SmallTileStyle}">
+                <iconPacks:PackIconBoxIcons Width="40"
+                                            Height="40"
+                                            Kind="RegularGear" />
+            </mah:Tile>
+            <mah:Tile Title="Share Report"
+                      Background="#BCDBEC"
+                      mah:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                      HorizontalTitleAlignment="Right"
+                      Style="{StaticResource LargeTileStyle}">
+                <iconPacks:PackIconBoxIcons Width="40"
+                                            Height="40"
+                                            Kind="RegularShare" />
+            </mah:Tile>
+        </WrapPanel>
+
+        <!-- Recent Reports Header -->
+        <TextBlock Grid.Column="1"
+                   Grid.Row="2"
+                   VerticalAlignment="Center"
+                   FontFamily="Segoe UI"
+                   FontSize="30"
+                   FontWeight="Light"
+                   Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                   Text="Recent Reports" />
+    </Grid>
+</UserControl>

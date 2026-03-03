@@ -16,6 +16,24 @@ namespace AfterpelagoWPF
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Navigates the main content area to the Report Wizard.
+        /// </summary>
+        public void NavigateToReportWizard()
+        {
+            var wizard = new ReportWizard();
+            wizard.NavigateBack += (_, _) => NavigateToDashboard();
+            MainContent.Content = wizard;
+        }
+
+        /// <summary>
+        /// Navigates the main content area back to the Dashboard.
+        /// </summary>
+        public void NavigateToDashboard()
+        {
+            MainContent.Content = new Dashboard();
+        }
+
         private void OnFileMenuClick(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.ContextMenu is { } menu)

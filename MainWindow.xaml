@@ -1,66 +1,63 @@
 ﻿<mah:MetroWindow x:Class="AfterpelagoWPF.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-        xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:AfterpelagoWPF"
-        mc:Ignorable="d"
-        Title="Afterpelago"
-        TitleCharacterCasing="Normal"
-        WindowState="Maximized"
-        WindowTitleBrush="Transparent"
-        WindowButtonCommandsOverlayBehavior="Never"
-        Height="720" 
-        Width="1280">
+xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+xmlns:views="clr-namespace:AfterpelagoWPF.Views"
+xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+xmlns:local="clr-namespace:AfterpelagoWPF"
+                 mc:Ignorable="d"
+                 Title="Afterpelago"
+                 TitleCharacterCasing="Normal"
+                 WindowState="Maximized"
+                 WindowTitleBrush="Transparent"
+                 WindowButtonCommandsOverlayBehavior="Never"
+                 Height="720"
+                 Width="1280">
 
     <mah:MetroWindow.Resources>
-        <SolidColorBrush x:Key="MahApps.Brushes.IdealForeground" Color="Black" />
-        <Style x:Key="LargeTileStyle" TargetType="mah:Tile">
-            <Setter Property="Height" Value="125" />
-            <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
-            <Setter Property="TextOptions.TextRenderingMode" Value="ClearType" />
-            <Setter Property="TitleFontSize" Value="14" />
-            <Setter Property="Width" Value="300" />
-        </Style>
-        <Style x:Key="SmallTileStyle" TargetType="mah:Tile">
-            <Setter Property="Height" Value="125" />
-            <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
-            <Setter Property="TextOptions.TextRenderingMode" Value="ClearType" />
-            <Setter Property="TitleFontSize" Value="14" />
-            <Setter Property="Width" Value="147" />
-        </Style>
+        <SolidColorBrush x:Key="MahApps.Brushes.IdealForeground"
+                         Color="Black" />
     </mah:MetroWindow.Resources>
-    
+
     <!-- Gradient BG -->
     <Window.Background>
-        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+        <LinearGradientBrush StartPoint="0,0"
+                             EndPoint="1,1">
             <!-- Top-left: soft lavender -->
-            <GradientStop Color="#E8C8DBF7" Offset="0.0" />
+            <GradientStop Color="#E8C8DBF7"
+                          Offset="0.0" />
             <!-- Upper-middle: pastel cyan -->
-            <GradientStop Color="#E8BDF3EA" Offset="0.2" />
+            <GradientStop Color="#E8BDF3EA"
+                          Offset="0.2" />
             <!-- Center-top: hint of mint green -->
-            <GradientStop Color="#E8C1F3C9" Offset="0.4" />
+            <GradientStop Color="#E8C1F3C9"
+                          Offset="0.4" />
             <!-- Center: warm white / lightest pink -->
-            <GradientStop Color="#E8F7D1E4" Offset="0.6" />
+            <GradientStop Color="#E8F7D1E4"
+                          Offset="0.6" />
             <!-- Lower: soft rose -->
-            <GradientStop Color="#E8FBCFDB" Offset="0.8" />
+            <GradientStop Color="#E8FBCFDB"
+                          Offset="0.8" />
             <!-- Bottom-right: faint peach/amber -->
-            <GradientStop Color="#E8F3DDC2" Offset="1.0" />
+            <GradientStop Color="#E8F3DDC2"
+                          Offset="1.0" />
         </LinearGradientBrush>
     </Window.Background>
 
     <!-- Action Menu -->
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands>
-            <Button Content="File" Click="OnFileMenuClick">
+            <Button Content="File"
+                    Click="OnFileMenuClick">
                 <Button.ContextMenu>
                     <ContextMenu x:Name="FileContextMenu">
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>
-            <Button Content="Tools" Click="OnToolsMenuClick">
+            <Button Content="Tools"
+                    Click="OnToolsMenuClick">
                 <Button.ContextMenu>
                     <ContextMenu x:Name="ToolsContextMenu">
                         <MenuItem Header="Import Game Data">
@@ -68,89 +65,28 @@
                             <MenuItem Header="From Web" />
                         </MenuItem>
                         <MenuItem Header="Configure Local Application Data">
-                            <MenuItem Header="Archipelago" Click="OnConfigureArchipelago" />
-                            <MenuItem Header="PopTracker" Click="OnConfigurePopTracker" />
+                            <MenuItem Header="Archipelago"
+                                      Click="OnConfigureArchipelago" />
+                            <MenuItem Header="PopTracker"
+                                      Click="OnConfigurePopTracker" />
                         </MenuItem>
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>
-            <Button Content="Debug" Click="OnDebugMenuClick">
+            <Button Content="Debug"
+                    Click="OnDebugMenuClick">
                 <Button.ContextMenu>
                     <ContextMenu x:Name="DebugContextMenu">
-                        <MenuItem Header="Browse Local Application Data" Click="OnBrowseLocalApplications" />
+                        <MenuItem Header="Browse Local Application Data"
+                                  Click="OnBrowseLocalApplications" />
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>
         </mah:WindowCommands>
     </mah:MetroWindow.RightWindowCommands>
     
-    <!-- Content Area -->
-    <Grid Background="{DynamicResource MahApps.Brushes.Accent4}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="100" />
-            <ColumnDefinition Width="430*" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="120" />
-            <RowDefinition Height="180" />
-            <RowDefinition Height="80" />
-            <RowDefinition Height="259*" />
-        </Grid.RowDefinitions>
-
-        <TextBlock Grid.Column="1"
-           VerticalAlignment="Center"
-           FontFamily="Segoe UI"
-           FontSize="30"
-           FontWeight="Light"
-           Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-           Text="Welcome to the Post-Game" />
-
-        <WrapPanel Grid.Row="1"
-           Grid.Column="1"
-           HorizontalAlignment="Left"
-           VerticalAlignment="Top">
-            <mah:Tile Title="New Report"
-                  Background="#FFCBE1"
-                  HorizontalTitleAlignment="Right"
-                  Margin="3"
-                  mah:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                  Style="{StaticResource LargeTileStyle}">
-                <iconPacks:PackIconBoxIcons Width="40" Height="40" Kind="SolidBookAdd" />
-            </mah:Tile>
-            <mah:Tile Title="Open Report"
-                  HorizontalTitleAlignment="Right"
-                  Background="#F9E1A8"
-  Margin="3"
-  mah:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-  Style="{StaticResource LargeTileStyle}">
-                <iconPacks:PackIconGameIcons Width="40" Height="40" Kind="OpenBook" />
-            </mah:Tile>
-            <mah:Tile Title="Configure"
-                  Margin="3"
-                  mah:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-  Background="#D6E5BD"
-  HorizontalTitleAlignment="Right"
-  Style="{StaticResource SmallTileStyle}">
-                <iconPacks:PackIconBoxIcons Width="40"
-                      Height="40"
-                      Kind="RegularGear" />
-            </mah:Tile>
-            <mah:Tile Title="Share Report"
-                  Background="#BCDBEC"
-                  mah:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                  HorizontalTitleAlignment="Right"
-              Style="{StaticResource LargeTileStyle}">
-                <iconPacks:PackIconBoxIcons Width="40" Height="40" Kind="RegularShare" />
-            </mah:Tile>
-        </WrapPanel>
-
-        <TextBlock Grid.Column="1"
-                   Grid.Row="2"
-                   VerticalAlignment="Center"
-                   FontFamily="Segoe UI"
-                   FontSize="30"
-                   FontWeight="Light"
-                   Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                   Text="Recent Reports" />
-    </Grid>
+    <!-- Main Content Area -->
+    <ContentControl x:Name="MainContent">
+        <views:Dashboard x:Name="DashboardView" />
+    </ContentControl>
 </mah:MetroWindow>
